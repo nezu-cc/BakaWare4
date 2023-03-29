@@ -7,5 +7,5 @@ add_library(BakaWare4 SHARED ${SOURCES} ${IMGUI})
 
 target_include_directories(BakaWare4 PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/third_party/imgui")
 
-target_compile_features(BakaWare4 PUBLIC cxx_std_20)
+target_compile_features(BakaWare4 PUBLIC c_std_17 cxx_std_20)
 
