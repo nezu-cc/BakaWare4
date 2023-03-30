@@ -9,3 +9,10 @@ target_include_directories(BakaWare4 PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/third_p
 
 target_compile_features(BakaWare4 PUBLIC c_std_17 cxx_std_20)
 
+if (MSVC)
+    # multi core parallel building
+    include(ProcessorCount)
+    ProcessorCount(PROCESSOR_COUNT)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /MP${PROCESSOR_COUNT}")
+    set(CMAKE_VS_MSBUILD_COMMAND "${CMAKE_VS_MSBUILD_COMMAND} /p:CL_MPCount=${PROCESSOR_COUNT} /m")
+endif ()
