@@ -11,9 +11,6 @@ extern LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam
 
 void render::initialize() noexcept {
     auto swap_chain_ptr = **dlls::render_system_dx11.find(PATTERN("66 0F 7F 05 ? ? ? ? 66 0F 7F 0D ? ? ? ? 48 89 35")).absolute<CSwapChainDx11***>(0x4);
-    auto hwnd_ptr = *dlls::render_system_dx11.find(PATTERN("48 89 3D ? ? ? ? FF 15 ? ? ? ? 89 3D")).absolute<PBYTE*>(0x3);
-
-    game_window = *reinterpret_cast<HWND*>(hwnd_ptr + 0x250);
 
     if (!set_swap_chain(swap_chain_ptr->pSwapChain))
         return;
@@ -27,6 +24,13 @@ void render::initialize() noexcept {
 
 bool render::set_swap_chain(IDXGISwapChain* swap_chain) noexcept {
     render::swap_chain = swap_chain;
+
+    DXGI_SWAP_CHAIN_DESC swapChainDesc;
+    if (FAILED(swap_chain->GetDesc(&swapChainDesc))) {
+        LOG_ERROR("Failed to get swap chain description.");
+        return false;
+    }
+    game_window = swapChainDesc.OutputWindow;
 
     if (FAILED(swap_chain->GetDevice(__uuidof(ID3D11Device), reinterpret_cast<PVOID*>(&device)))) {
         LOG_ERROR("Failed to get device from swap chain.");
