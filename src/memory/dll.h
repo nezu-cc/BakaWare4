@@ -76,6 +76,7 @@ struct dll {
 namespace dlls {
 
     inline dll game_overlay_renderer{ "gameoverlayrenderer64.dll" };
+    inline dll render_system_dx11{ "rendersystemdx11.dll" };
 
     inline void initialize() noexcept
     {

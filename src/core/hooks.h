@@ -1,6 +1,7 @@
 #pragma once
 
 #include <Windows.h>
+#include <d3d11.h>
 
 // #include "../valve/cs/cs.h"
 #include "../valve/se/se.h"
@@ -8,7 +9,7 @@
 #define DECLARE_HOOK(name, ret, base, ... /* args */) namespace name { \
 using ty = ret(__thiscall*)(base* ecx, __VA_ARGS__); \
 inline ty original; \
-ret __fastcall fn(base* ecx, int, __VA_ARGS__); \
+ret WINAPI fn(base* ecx, __VA_ARGS__); \
 }
 
 #define DECLARE_PROXY(name, prop_name) namespace name { \
@@ -18,9 +19,11 @@ void proxy(cs::recv_proxy_data* data, void*, void*); \
 
 namespace hooks {
 
-    inline HWND game_window{ };
     inline WNDPROC original_wnd_proc{ };
     extern LRESULT CALLBACK wnd_proc(HWND wnd, UINT msg, WPARAM wparam, LPARAM lparam);
+
+    DECLARE_HOOK(present, HRESULT, IDXGISwapChain, UINT, UINT);
+    DECLARE_HOOK(resize_buffers, HRESULT, IDXGISwapChain, UINT, UINT, UINT, DXGI_FORMAT, UINT);
 
     // DECLARE_HOOK(level_init_post_entity, void, se::client_dll)
     // DECLARE_HOOK(level_shutdown, void, se::client_dll)

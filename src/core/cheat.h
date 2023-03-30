@@ -2,6 +2,7 @@
 
 #include "../memory/interfaces.h"
 #include "../memory/hook_mgr.h"
+#include "../render/render.h"
 
 namespace cheat {
 
@@ -13,6 +14,7 @@ namespace cheat {
         logger::initialize(L"csgo", L"log.txt");
         dlls::initialize();
         interfaces::initialize();
+        render::initialize();
         // netvars::initialize();
         hooks::initialize();
         // cfg::initialize();

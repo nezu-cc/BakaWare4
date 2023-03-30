@@ -1,7 +1,5 @@
 #pragma once
 
-#include <d3d9.h>
-
 #include "../valve/se/se.h"
 #include "memory.h"
 
@@ -54,7 +52,7 @@ namespace interfaces {
 
 // inline interface_holder<se::client_dll*>             client{ };
 
-inline interface_holder<void*> dx9_device{ };
+// inline interface_holder<IDXGISwapChain*> swap_chain{ };
 
 void initialize() noexcept;
 
