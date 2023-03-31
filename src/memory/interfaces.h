@@ -50,9 +50,11 @@ struct interface_holder {
 
 namespace interfaces {
 
-// inline interface_holder<se::client_dll*>             client{ };
-
-// inline interface_holder<IDXGISwapChain*> swap_chain{ };
+inline interface_holder<se::client_dll*>            client{ };
+inline interface_holder<se::engine_client*>         engine{ };
+inline interface_holder<se::game_resource_service*> game_resource{ };
+inline interface_holder<se::entity_list*>           entity_list{ };
+inline interface_holder<se::schema_system*>         schema_system{ };
 
 void initialize() noexcept;
 

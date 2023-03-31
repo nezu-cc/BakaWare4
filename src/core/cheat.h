@@ -15,7 +15,6 @@ namespace cheat {
         dlls::initialize();
         interfaces::initialize();
         render::initialize();
-        // netvars::initialize();
         hooks::initialize();
         // cfg::initialize();
 

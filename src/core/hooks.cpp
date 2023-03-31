@@ -10,11 +10,11 @@ void hooks::initialize() noexcept
     else
         LOG_ERROR("Failed to hook window proc, game window HWND missing!");
 
-    hook_func = dlls::game_overlay_renderer.find(PATTERN("48 89 5C 24 08 57 48 83 EC 30 33 C0")).cast<decltype(hook_func)>();
-    unhook_func = dlls::game_overlay_renderer.find(PATTERN("E8 ? ? ? ? 0F 57 C0 0F 11 05")).absolute<decltype(unhook_func)>();
+    hook_func = dlls::game_overlay_renderer64.find(PATTERN("48 89 5C 24 08 57 48 83 EC 30 33 C0")).cast<decltype(hook_func)>();
+    unhook_func = dlls::game_overlay_renderer64.find(PATTERN("E8 ? ? ? ? 0F 57 C0 0F 11 05")).absolute<decltype(unhook_func)>();
 
-    auto present_ptr = dlls::game_overlay_renderer.find(PATTERN("48 FF 25 ? ? ? ? 48 89 5C 24 30")).absolute<void**>(0x3);
-    auto resize_buffers_ptr = dlls::game_overlay_renderer.find(PATTERN("48 83 C4 30 41 5F 41 5E 5F 48 FF 25")).absolute<void**>(0xC);
+    auto present_ptr = dlls::game_overlay_renderer64.find(PATTERN("48 FF 25 ? ? ? ? 48 89 5C 24 30")).absolute<void**>(0x3);
+    auto resize_buffers_ptr = dlls::game_overlay_renderer64.find(PATTERN("48 83 C4 30 41 5F 41 5E 5F 48 FF 25")).absolute<void**>(0xC);
 
     SET_PTR_HOOK(present_ptr, present);
     SET_PTR_HOOK(resize_buffers_ptr, resize_buffers);

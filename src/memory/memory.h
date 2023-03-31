@@ -8,6 +8,7 @@
 
 #include "address.h"
 #include "dll.h"
+#include "netvars.h"
 
 namespace memory {
 
@@ -90,8 +91,8 @@ namespace memory {
 
 }
 
-#define VIRTUAL_FUNCTION(name, ret, idx, params, args) \
-inline ret name params noexcept \
+#define VIRTUAL_FUNCTION(name, ret, idx, args, ... /* params */) \
+inline ret name(__VA_ARGS__) noexcept \
 { \
     return memory::call_virtual<ret, idx>args; \
 }
@@ -103,3 +104,11 @@ inline ret name(__VA_ARGS__) noexcept \
     static ret(__thiscall* fn)(void*, __VA_ARGS__) = dll.find(PATTERN(sig)).cast<decltype(fn)>(); \
     return fn args; \
 }
+
+#define VIRTUAL_FUNCTION_SIG_ABSOLUTE(name, ret, dll, sig, offset, args, ... /* params */) \
+inline ret name(__VA_ARGS__) noexcept \
+{ \
+    static ret(__thiscall* fn)(void*, __VA_ARGS__) = dll.find(PATTERN(sig)).absolute<decltype(fn)>(offset); \
+    return fn args; \
+}
+
