@@ -10,8 +10,8 @@
 
 namespace hooks {
 
-    inline std::add_pointer_t<bool(void*, void*, void*, bool)> hook_func{ };
-    inline std::add_pointer_t<void(void*, bool)> unhook_func{ };
+    inline std::add_pointer_t<void* (void*, void*, bool)> hook_func{ };
+    inline std::add_pointer_t<void(void*)> unhook_func{ };
 
     inline std::map<void*, void*> hooked_fns{ }; /* Only contains signature hooks */
     inline std::map<void**, void*> hooked_ptrs{ }; /* Only contains pointer hooks */
@@ -42,7 +42,8 @@ namespace hooks {
         ASSERT(target);
         ASSERT(dll.is_within_section(target, ".text"_hash));
         hooked_fns[hook] = target;
-        if (!hook_func(target, hook, original, false))
+        *original = hook_func(target, hook, false);
+        if (!*original)
             LOG_ERROR("Error while hooking function!"); /* Not fatal, but we should warn about it */
     };
 

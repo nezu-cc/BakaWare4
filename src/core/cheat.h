@@ -8,6 +8,7 @@ namespace cheat {
 
     // inline cs::local_player local{ };
     inline bool should_unhook{ };
+    inline d2 screen_size{ };
 
     inline void initialize() noexcept
     {
@@ -23,11 +24,10 @@ namespace cheat {
 
     inline DWORD end(LPVOID instance) noexcept
     {
-        // interfaces::input_system->enable_input();
         hooks::end();
         logger::end();
 
-        FreeLibraryAndExitThread(static_cast<HMODULE>(instance), EXIT_SUCCESS);
+        // FreeLibraryAndExitThread(static_cast<HMODULE>(instance), EXIT_SUCCESS);
         return EXIT_SUCCESS;
     }
 

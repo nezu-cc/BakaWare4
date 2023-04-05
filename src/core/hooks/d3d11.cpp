@@ -5,6 +5,9 @@
 HRESULT WINAPI hooks::present::fn(IDXGISwapChain *swap_chain, UINT SyncInterval, UINT Flags) {
     if (cheat::should_unhook)
         return original(swap_chain, SyncInterval, Flags);
+    
+    if (!render::render_target_view)
+        render::set_swap_chain(swap_chain);
 
     render::render();
 
@@ -12,14 +15,8 @@ HRESULT WINAPI hooks::present::fn(IDXGISwapChain *swap_chain, UINT SyncInterval,
 }
 
 HRESULT WINAPI hooks::resize_buffers::fn(IDXGISwapChain *swap_chain, UINT BufferCount, UINT Width, UINT Height, DXGI_FORMAT NewFormat, UINT SwapChainFlags) {
-    auto ret = original(swap_chain, BufferCount, Width, Height, NewFormat, SwapChainFlags);
-    if (cheat::should_unhook)
-        return ret;
+    if (!cheat::should_unhook)
+        render::cleanup_render_target();
 
-    render::cleanup_render_target();
-
-    if (SUCCEEDED(ret))
-        render::set_swap_chain(swap_chain);
-
-    return ret;
+    return original(swap_chain, BufferCount, Width, Height, NewFormat, SwapChainFlags);
 }

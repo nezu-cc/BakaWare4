@@ -5,3 +5,4 @@
 #include "client.h"
 #include "engine.h"
 #include "schema.h"
+#include "inputsystem.h"

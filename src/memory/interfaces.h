@@ -25,6 +25,7 @@ struct interface_holder {
     template<bool replace_vmt = false>
     inline void initialize(ptr vptr) noexcept
     {
+        ASSERT(vptr);
         constexpr int dynamic_cast_info_len = 1;
 
         instance = vptr;
@@ -54,7 +55,9 @@ inline interface_holder<se::client_dll*>            client{ };
 inline interface_holder<se::engine_client*>         engine{ };
 inline interface_holder<se::game_resource_service*> game_resource{ };
 inline interface_holder<se::entity_list*>           entity_list{ };
+inline interface_holder<se::csgo_input*>            csgo_input{ };
 inline interface_holder<se::schema_system*>         schema_system{ };
+inline interface_holder<se::input_system*>          input_system{ };
 
 void initialize() noexcept;
 

@@ -23,4 +23,8 @@ struct entity_list {
     VIRTUAL_FUNCTION_SIG_ABSOLUTE(get_max_entities, int, dlls::client, "33 DB E8 ? ? ? ? 8B 08", 3, (this, max), int* max)
 };
 
+struct csgo_input {
+    
+};
+
 } // namespace se

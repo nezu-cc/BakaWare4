@@ -54,8 +54,10 @@ bool render::set_swap_chain(IDXGISwapChain* swap_chain) noexcept {
         LOG_ERROR("Failed to create render target view.");
         return false;
     }
-
     back_buffer->Release();
+
+    interfaces::engine->get_screen_size(&cheat::screen_size.x, &cheat::screen_size.y);
+
     return true;
 }
 
@@ -82,24 +84,41 @@ void render::render() noexcept {
 }
 
 bool render::input(HWND wnd, UINT msg, WPARAM wparam, LPARAM lparam) noexcept {
+    ImGui_ImplWin32_WndProcHandler(wnd, msg, wparam, lparam);
     if (!menu::is_open)
         return false;
     
-    bool ret = ImGui_ImplWin32_WndProcHandler(wnd, msg, wparam, lparam);
-    return !ret;
-
-    // || msg == WM_MOUSEMOVE || msg == WM_NCHITTEST || msg == WM_GETDLGCODE
-
-    // bool want_kbd_state = ImGui::GetCurrentContext() && ImGui::GetIO().WantTextInput;
-    // static bool last_want_kbd_state = want_kbd_state;
-
-    // // FIXME: InputSystem
-    // // I::InputSystem->enableInput(!want_kbd_state);
-    // // if (want_kbd_state != last_want_kbd_state)
-    // //     I::InputSystem->resetInputState();
-    // last_want_kbd_state = want_kbd_state;
-
-    // return ret && !((msg >= WM_KEYFIRST && msg <= WM_KEYLAST) && !ImGui::GetIO().WantCaptureKeyboard);
+    switch (msg) {
+        case WM_MOUSEMOVE:
+        case WM_NCMOUSEMOVE:
+        case WM_MOUSELEAVE:
+        case WM_NCMOUSELEAVE:
+        case WM_LBUTTONDOWN:
+        case WM_LBUTTONDBLCLK:
+        case WM_RBUTTONDOWN:
+        case WM_RBUTTONDBLCLK:
+        case WM_MBUTTONDOWN:
+        case WM_MBUTTONDBLCLK:
+        case WM_XBUTTONDOWN:
+        case WM_XBUTTONDBLCLK:
+        case WM_LBUTTONUP:
+        case WM_RBUTTONUP:
+        case WM_MBUTTONUP:
+        case WM_XBUTTONUP:
+        case WM_MOUSEWHEEL:
+        case WM_MOUSEHWHEEL:
+        case WM_KEYDOWN:
+        case WM_KEYUP:
+        case WM_SYSKEYDOWN:
+        case WM_SYSKEYUP:
+        case WM_SETFOCUS:
+        case WM_KILLFOCUS:
+        case WM_CHAR:
+        case WM_DEVICECHANGE:
+            return true;
+        default:
+            return false;
+    }
 }
 
 void render::end() noexcept {
