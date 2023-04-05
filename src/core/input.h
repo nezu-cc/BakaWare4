@@ -1,5 +1,6 @@
 #pragma once
 
+#include "../base/base.h"
 #include <array>
 #include <Windows.h>
 #ifdef small

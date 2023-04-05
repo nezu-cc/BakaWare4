@@ -1,6 +1,7 @@
 #pragma once
 
 #include <d3d11.h>
+#include <imgui.h>
 #include "../memory/memory.h"
 
 namespace render {
@@ -23,5 +24,16 @@ void cleanup_render_target() noexcept;
 void render() noexcept;
 bool input(HWND wnd, UINT msg, WPARAM wparam, LPARAM lparam) noexcept;
 void end() noexcept;
+
+class renderer {
+public:
+    renderer(ImDrawList* draw_list) noexcept : draw_list(draw_list) {}
+
+    void rect(float x, float y, float w, float h, clr4 color) {
+        draw_list->AddRect(ImVec2(x, y), ImVec2(x + w, y + h), color.rgba);
+    }
+private:
+    ImDrawList* draw_list;
+};
 
 }

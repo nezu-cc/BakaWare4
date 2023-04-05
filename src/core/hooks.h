@@ -1,5 +1,6 @@
 #pragma once
 
+#include "../base/base.h"
 #include <Windows.h>
 #include <d3d11.h>
 

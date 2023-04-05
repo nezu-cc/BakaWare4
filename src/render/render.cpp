@@ -3,7 +3,7 @@
 #include "../memory/memory.h"
 #include "../core/cheat.h"
 #include "menu.h"
-#include <imgui.h>
+#include "../core/features/features.h"
 #include <backends/imgui_impl_dx11.h>
 #include <backends/imgui_impl_win32.h>
 
@@ -75,6 +75,10 @@ void render::render() noexcept {
     ImGui_ImplDX11_NewFrame();
     ImGui_ImplWin32_NewFrame();
     ImGui::NewFrame();
+
+    auto r = render::renderer(ImGui::GetBackgroundDrawList());
+
+    features::esp::render(&r);
 
     menu::render();
 

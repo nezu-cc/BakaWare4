@@ -1,5 +1,6 @@
 #pragma once
 
+#include "base.h"
 #include <filesystem>
 namespace fs = std::filesystem;
 #include <string_view>
