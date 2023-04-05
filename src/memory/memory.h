@@ -12,23 +12,6 @@
 
 namespace memory {
 
-    struct virtual_protect {
-        LPVOID address{ };
-        SIZE_T size{ };
-        DWORD flags{ };
-
-        explicit virtual_protect(LPVOID address, SIZE_T size, DWORD flags) noexcept
-            : address(address), size(size)
-        {
-            VirtualProtect(address, size, flags, &flags);
-        }
-
-        ~virtual_protect()
-        {
-            VirtualProtect(address, size, flags, &flags);
-        }
-    };
-
     template<class ty, int i, class... va_args>
     ty call_virtual(void* base, va_args... args) noexcept
     {
@@ -69,24 +52,6 @@ namespace memory {
             ++length;
 
         return length;
-    }
-
-    template<class ty>
-    bool read(address addr, ty& data, SIZE_T size = sizeof(ty)) noexcept
-    {
-        return ReadProcessMemory(HANDLE(-1), addr, &data, size, nullptr);
-    }
-
-    template<class ty>
-    bool write(address addr, ty& data, SIZE_T size = sizeof(ty)) noexcept
-    {
-        return WriteProcessMemory(HANDLE(-1), addr, &data, size, nullptr);
-    }
-
-    inline bool protect(address addr, DWORD flags, SIZE_T size) noexcept
-    {
-        DWORD _;
-        return VirtualProtect(addr, size, flags, &_);
     }
 
 }

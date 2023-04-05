@@ -51,7 +51,7 @@ struct address {
         const auto target = *reinterpret_cast<int32_t*>(jmp);
         if (target)
             // Base address + offset + size of next instruction + target address.
-            return reinterpret_cast<ty>(jmp + abs_offset + 4 + target);
+            return reinterpret_cast<ty>(jmp + abs_offset + sizeof(int32_t) + target);
         return ty();
     }
 };
