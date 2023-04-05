@@ -9,26 +9,10 @@ namespace cheat {
     // inline cs::local_player local{ };
     inline bool should_unhook{ };
     inline d2 screen_size{ };
+    inline se::global_vars* global_vars{ };
 
-    inline void initialize() noexcept
-    {
-        logger::initialize(L"csgo", L"log.txt");
-        dlls::initialize();
-        interfaces::initialize();
-        render::initialize();
-        hooks::initialize();
-        // cfg::initialize();
-
-        LOG_SUCCESS("Cheat initialized. Last full build: {} {}", __DATE__, __TIME__);
-    }
-
-    inline DWORD end(LPVOID instance) noexcept
-    {
-        hooks::end();
-        logger::end();
-
-        // FreeLibraryAndExitThread(static_cast<HMODULE>(instance), EXIT_SUCCESS);
-        return EXIT_SUCCESS;
-    }
+    void initialize() noexcept;
+    DWORD end(LPVOID instance) noexcept;
+    void update_global_vars() noexcept;
 
 }

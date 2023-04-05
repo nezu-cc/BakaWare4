@@ -58,6 +58,7 @@ inline interface_holder<se::entity_list*>           entity_list{ };
 inline interface_holder<se::csgo_input*>            csgo_input{ };
 inline interface_holder<se::schema_system*>         schema_system{ };
 inline interface_holder<se::input_system*>          input_system{ };
+inline interface_holder<se::client_mode*>           client_mode{ };
 
 void initialize() noexcept;
 

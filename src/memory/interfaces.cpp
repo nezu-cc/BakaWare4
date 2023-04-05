@@ -22,6 +22,7 @@ void interfaces::initialize() noexcept
 
     entity_list.initialize(game_resource->get_entity_list());
     csgo_input.initialize<true>(*dlls::client.find(PATTERN("48 8B 0D ? ? ? ? 48 8B 01 FF 50 ? 8B DF")).absolute<se::csgo_input**>(3));
+    client_mode.initialize<true>(dlls::client.find(PATTERN("48 8D 0D ? ? ? ? 48 69 C0 ? ? ? ? 48 03 C1 C3 CC CC")).absolute<se::client_mode*>(3));
 
     LOG_INFO("Interfaces initialized.");
 }

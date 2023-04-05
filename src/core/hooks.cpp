@@ -24,6 +24,7 @@ void hooks::initialize() noexcept
 
     SET_VT_HOOK(interfaces::csgo_input, mouse_input_enabled, 10);
     SET_VT_HOOK(interfaces::input_system, relative_mouse_mode, 76);
+    SET_VT_HOOK(interfaces::client_mode, level_init, 23);
 
     LOG_INFO("Hooks initialized.");
 }

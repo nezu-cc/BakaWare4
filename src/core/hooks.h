@@ -28,6 +28,7 @@ namespace hooks {
     DECLARE_HOOK(resize_buffers, HRESULT, IDXGISwapChain, UINT, UINT, UINT, DXGI_FORMAT, UINT);
     DECLARE_HOOK(mouse_input_enabled, bool, void);
     DECLARE_HOOK(relative_mouse_mode, void*, se::input_system, bool);
+    DECLARE_HOOK(level_init, void, se::client_mode, const char*);
 
     // DECLARE_HOOK(level_init_post_entity, void, se::client_dll)
     // DECLARE_HOOK(level_shutdown, void, se::client_dll)

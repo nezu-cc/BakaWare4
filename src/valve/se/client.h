@@ -27,4 +27,27 @@ struct csgo_input {
     
 };
 
-} // namespace se
+struct client_mode {
+
+};
+
+struct global_vars {
+public:
+    float realtime;
+    std::int32_t frame_count;
+    PAD(0x8)
+    std::uint32_t max_clients;
+    float interval_per_tick;
+    PAD(0x12)
+    float curtime;
+    float curtime2;
+    PAD(0xC)
+    std::int32_t tick_count;
+    float interval_per_tick2;
+    void* current_netchan;
+    PAD(0x130)
+    char* current_map;
+    char* current_mapname;
+};
+
+}
