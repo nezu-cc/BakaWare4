@@ -1,5 +1,6 @@
 #include "features.h"
 #include "../../base/math.h"
+#include "../../core/cheat.h"
 
 void features::esp::render(render::renderer* r) noexcept {
     // TODO: config
@@ -7,9 +8,18 @@ void features::esp::render(render::renderer* r) noexcept {
     if (!interfaces::engine->is_in_game() || !interfaces::engine->is_connected())
         return;
 
-    vec2 pos;
-    if (math::world_to_screen(vec3(0, 0, 0), pos))
-        r->rect(pos.x - 5, pos.y -5, 10, 10, clr4::red());
+    for (uint32_t i = 1; i < cheat::global_vars->max_clients; i++) {
+        auto controller = interfaces::entity_list->get_base_entity<cs::player_controller*>(i);
+        if (!controller || controller->m_bIsLocalPlayerController() || !controller->m_bPawnIsAlive())
+            continue;
+        
+        auto player = controller->m_hPawn().get_as<cs::player_pawn>();
+        if (!player)
+            continue;
 
-    r->rect(100, 100, 100, 100, clr4::red());
+        bbox bb;
+        if (!player->get_bounding_box(bb))
+            continue;
+        r->rect(bb.x, bb.y, bb.w - bb.x, bb.h - bb.y, clr4::red());
+    }
 }
