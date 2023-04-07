@@ -31,6 +31,15 @@ struct clr4 {
     static clr4 red(uint8_t a = 255) noexcept { return clr4(255, 0, 0, a); }
     static clr4 green(uint8_t a = 255) noexcept { return clr4(0, 255, 0, a); }
     static clr4 blue(uint8_t a = 255) noexcept { return clr4(0, 0, 255, a); }
+
+    static clr4 lerp(const clr4& a, const clr4& b, float t) noexcept {
+        return clr4(
+            std::lerp(a.r_base(), b.r_base(), t),
+            std::lerp(a.g_base(), b.g_base(), t),
+            std::lerp(a.b_base(), b.b_base(), t),
+            std::lerp(a.a_base(), b.a_base(), t)
+        );
+    }
 };
 
 static_assert(sizeof(clr4) == 4);

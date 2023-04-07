@@ -29,9 +29,27 @@ class renderer {
 public:
     renderer(ImDrawList* draw_list) noexcept : draw_list(draw_list) {}
 
-    void rect(float x, float y, float w, float h, clr4 color) {
-        draw_list->AddRect(ImVec2(x, y), ImVec2(x + w, y + h), color.rgba);
+    void rect(float x1, float y1, float x2, float y2, clr4 color, float t = 1.0f, float r = 0.0f) {
+        draw_list->AddRect(ImVec2(x1, y1), ImVec2(x2, y2), color.rgba, r, ImDrawFlags_RoundCornersAll, t);
     }
+
+    void rect_filled(float x1, float y1, float x2, float y2, clr4 color, float r = 0.0f) {
+        draw_list->AddRectFilled(ImVec2(x1, y1), ImVec2(x2, y2), color.rgba, r, ImDrawFlags_RoundCornersAll);
+    }
+
+    void rect_filled_multi_color(float x1, float y1, float x2, float y2, clr4 upr_left, clr4 upr_right, clr4 btm_right, clr4 btm_left) {
+        draw_list->AddRectFilledMultiColor(ImVec2(x1, y1), ImVec2(x2, y2), upr_left.rgba, upr_right.rgba, btm_right.rgba, btm_left.rgba);
+    }
+
+    vec2 calc_text_size(const char* text) {
+        return ImGui::CalcTextSize(text);
+    }
+
+    void text(float x, float y, clr4 color, const char* text, bool outline = true) {
+        draw_list->AddText(ImVec2(x + 1, y + 1), clr4::black(color.a).rgba, text);
+        draw_list->AddText(ImVec2(x, y), color.rgba, text);
+    }
+
 private:
     ImDrawList* draw_list;
 };

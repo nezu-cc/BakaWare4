@@ -1,11 +1,15 @@
 #pragma once
 
+#include <imgui.h>
+
 struct vec2 {
     float x{ }, y{ };
 
     constexpr vec2() noexcept = default;
     constexpr vec2(float x, float y) noexcept
         : x(x), y(y) { }
+    constexpr vec2(ImVec2 v) noexcept
+        : x(v.x), y(v.y) { }
 };
 
 struct vec3 {
