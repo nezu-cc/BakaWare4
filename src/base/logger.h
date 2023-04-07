@@ -9,7 +9,9 @@ namespace ch = std::chrono;
 
 #include "winapi.h"
 
-#ifdef _DEBUG
+#define LOG_ENABLED
+
+#ifdef LOG_ENABLED
 #define LOG_SUCCESS(fmt, ...) logger::add<logger::level::success>(fmt, __VA_ARGS__)
 #define LOG_INFO(fmt, ...) logger::add<logger::level::info>(fmt, __VA_ARGS__)
 #define LOG_ERROR(fmt, ...) logger::add<logger::level::error>(fmt, __VA_ARGS__)
@@ -24,7 +26,6 @@ namespace ch = std::chrono;
 namespace logger {
 
     inline HANDLE console{ };
-    inline std::wstring log_name{ };
 
     enum class level {
         success,
@@ -38,7 +39,7 @@ namespace logger {
     template<level lvl, class... va_args>
     void add(std::string_view fmt, va_args&&... args) noexcept
     {
-    #ifdef _DEBUG
+    #ifdef LOG_ENABLED
         if constexpr (lvl != level::raw) {
             std::cout << "[ ";
             switch (lvl) {
@@ -63,17 +64,11 @@ namespace logger {
             std::cout << " ] " << std::put_time(&tm, "[%T] ");
         }
 
-        static std::fstream out_file{ log_name, std::fstream::out | std::fstream::app };
-
         if constexpr (sizeof...(args) > 0) {
             const auto& str = std::vformat(fmt, std::make_format_args(std::forward<decltype(args)>(args)...));
             std::cout << str << '\n';
-            if (out_file)
-                out_file << str << '\n';
         } else {
             std::cout << fmt << '\n';
-            if (out_file)
-                out_file << fmt << '\n';
         }
     #endif
     }
@@ -81,7 +76,7 @@ namespace logger {
     template<level lvl, class... va_args>
     void add(std::wstring_view fmt, va_args&&... args) noexcept
     {
-    #ifdef _DEBUG
+    #ifdef LOG_ENABLED
         if constexpr (lvl != level::raw) {
             std::wcout << L"[ ";
             switch (lvl) {
@@ -106,24 +101,18 @@ namespace logger {
             std::wcout << L" ] " << std::put_time(&tm, L"[%T] ");
         }
 
-        static std::wfstream out_file{ log_name, std::wfstream::out | std::wfstream::app };
-
         if constexpr (sizeof...(args) > 0) {
             const auto& str = std::vformat(fmt, std::make_wformat_args(std::forward<decltype(args)>(args)...));
             std::wcout << str << '\n';
-            if (out_file)
-                out_file << str << '\n';
         } else {
             std::wcout << fmt << '\n';
-            if (out_file)
-                out_file << fmt << '\n';
         }
     #endif
     }
 
-    inline void initialize(std::wstring_view console_title, std::wstring_view log_filename) noexcept
+    inline void initialize(std::wstring_view console_title) noexcept
     {
-    #ifdef _DEBUG
+    #ifdef LOG_ENABLED
         AllocConsole();
         AttachConsole(ATTACH_PARENT_PROCESS);
         SetConsoleTitleW(console_title.data());
@@ -131,16 +120,13 @@ namespace logger {
         freopen_s(reinterpret_cast<FILE**>(stdout), "CONOUT$", "w", stdout);
         console = GetStdHandle(STD_OUTPUT_HANDLE);
 
-        log_name = log_filename;
-        win::scoped_handle f = CreateFileW(log_name.c_str(), 0, 0, nullptr, CREATE_NEW, 0, nullptr);
-
         LOG_INFO("Logger initialized.");
     #endif
     }
 
     inline void end() noexcept
     {
-    #ifdef _DEBUG
+    #ifdef LOG_ENABLED
         fclose(stdout);
         FreeConsole();
     #endif

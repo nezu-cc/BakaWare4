@@ -1,7 +1,7 @@
 #include "cheat.h"
 
 void cheat::initialize() noexcept {
-    logger::initialize(L"csgo", L"log.txt");
+    logger::initialize(L"csgo");
     dlls::initialize();
     interfaces::initialize();
     cheat::update_global_vars();
