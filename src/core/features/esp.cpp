@@ -3,7 +3,9 @@
 #include "../../core/cheat.h"
 
 void features::esp::render(render::renderer* r) noexcept {
-    // TODO: config
+    // FIXME: other types of esp
+    if (cfg.esp.players.enabled == false)
+        return;
 
     if (!interfaces::engine->is_in_game() || !interfaces::engine->is_connected())
         return;
@@ -23,8 +25,7 @@ void features::esp::render(render::renderer* r) noexcept {
 
         const clr4 border_clr = clr4::black(128);
 
-        // TODO: box config
-        if (true) {
+        if (cfg.esp.players.box) {
             r->rect(
                 bb.x, bb.y, 
                 bb.w, bb.h, 
@@ -38,8 +39,7 @@ void features::esp::render(render::renderer* r) noexcept {
             );
         }
 
-        // TODO: hp config
-        if (true) {
+        if (cfg.esp.players.health) {
             const uint32_t heath = std::min(controller->m_iPawnHealth(), 100u);
 
             // TODO: hp color config
@@ -63,8 +63,7 @@ void features::esp::render(render::renderer* r) noexcept {
             );
         }
 
-        // TODO: name config
-        if (true) {
+        if (cfg.esp.players.name) {
             const auto name = controller->m_sSanitizedPlayerName();
             if (name && strlen(name)) {
                 const auto name_size = r->calc_text_size(name).x;
