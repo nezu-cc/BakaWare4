@@ -11,8 +11,10 @@ void menu::render() noexcept {
 
     ImGui::Text("w: %d, h: %d", cheat::screen_size.x, cheat::screen_size.y);
     
+#ifdef _DEBUG
     if (ImGui::Button("Unhook"))
         cheat::should_unhook = true;
+#endif
 
     if (ImGui::Button("Crash"))
         ASSERT_MSG(false, "Crash button pressed!");
