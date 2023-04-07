@@ -13,8 +13,8 @@ void hooks::initialize() noexcept
     else
         LOG_ERROR("Failed to hook window proc, game window HWND missing!");
 
-    hook_func = dlls::cs2.find(PATTERN("48 8B C4 48 89 58 08 48 89 70 10 57")).cast<decltype(hook_func)>();
-    unhook_func = dlls::cs2.find(PATTERN("48 85 C9 0F 84 94")).cast<decltype(unhook_func)>();
+    // hook_func = dlls::cs2.find(PATTERN("48 8B C4 48 89 58 08 48 89 70 10 57")).cast<decltype(hook_func)>();
+    // unhook_func = dlls::cs2.find(PATTERN("48 85 C9 0F 84 94")).cast<decltype(unhook_func)>();
 
     auto present_ptr = dlls::game_overlay_renderer64.find(PATTERN("48 FF 25 ? ? ? ? 48 89 5C 24 30")).absolute<void**>(0x3);
     auto resize_buffers_ptr = dlls::game_overlay_renderer64.find(PATTERN("48 83 C4 30 41 5F 41 5E 5F 48 FF 25")).absolute<void**>(0xC);
@@ -33,8 +33,8 @@ void hooks::end() noexcept {
     for (auto a : interfaces::hooked_tables)
         static_cast<interface_holder<void*>*>(a)->restore();
 
-    for (auto& a : hooked_fns)
-        unhook_func(a.second);
+    // for (auto& a : hooked_fns)
+    //     unhook_func(a.second);
 
     for (auto& a : hooked_ptrs)
         *a.first = a.second;

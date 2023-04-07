@@ -10,10 +10,10 @@
 
 namespace hooks {
 
-    inline std::add_pointer_t<void* (void*, void*, bool)> hook_func{ };
-    inline std::add_pointer_t<void(void*)> unhook_func{ };
+    //inline std::add_pointer_t<void* (void*, void*, bool)> hook_func{ };
+    //inline std::add_pointer_t<void(void*)> unhook_func{ };
 
-    inline std::map<void*, void*> hooked_fns{ }; /* Only contains signature hooks */
+    //inline std::map<void*, void*> hooked_fns{ }; /* Only contains signature hooks */
     inline std::map<void**, void*> hooked_ptrs{ }; /* Only contains pointer hooks */
 
     void initialize() noexcept;
@@ -35,16 +35,16 @@ namespace hooks {
         *ptr = hook;
     }
 
-    template<size_t len>
-    void set(dll& dll, std::array<int, len>&& sig, void* hook, void** original) noexcept
-    {
-        auto target = dll.find<len>(std::move(sig));
-        ASSERT(target);
-        ASSERT(dll.is_within_section(target, ".text"_hash));
-        hooked_fns[hook] = target;
-        *original = hook_func(target, hook, false);
-        if (!*original)
-            LOG_ERROR("Error while hooking function!"); /* Not fatal, but we should warn about it */
-    };
+    // template<size_t len>
+    // void set(dll& dll, std::array<int, len>&& sig, void* hook, void** original) noexcept
+    // {
+    //     auto target = dll.find<len>(std::move(sig));
+    //     ASSERT(target);
+    //     ASSERT(dll.is_within_section(target, ".text"_hash));
+    //     hooked_fns[hook] = target;
+    //     *original = hook_func(target, hook, false);
+    //     if (!*original)
+    //         LOG_ERROR("Error while hooking function!"); /* Not fatal, but we should warn about it */
+    // };
 
 }
