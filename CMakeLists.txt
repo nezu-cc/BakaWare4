@@ -10,3 +10,4 @@ if (MSVC)
 endif ()
 
 add_subdirectory(cheat)
+add_subdirectory(injector)
