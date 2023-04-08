@@ -26,4 +26,6 @@ jobs:
     - uses: actions/upload-artifact@v3
       with:
         name: ${{matrix.build-type}}
-        path: ${{github.workspace}}/build/${{matrix.build-type}}
+        path: |
+          ${{github.workspace}}/build/cheat/${{matrix.build-type}}
+          ${{github.workspace}}/build/injector/${{matrix.build-type}}
