@@ -76,6 +76,7 @@ struct dll {
 namespace dlls {
 
     inline dll cs2{ "cs2.exe" };
+    inline dll tier0{ "tier0.dll" };
     inline dll sdl2{ "SDL2.dll" };
     inline dll game_overlay_renderer64{ "gameoverlayrenderer64.dll" };
     inline dll render_system_dx11{ "rendersystemdx11.dll" };
@@ -106,7 +107,6 @@ namespace dlls {
 
         while (cur->BaseDllName.Length) {
             loaded.insert_or_assign(fnv1a::hash(cur->BaseDllName.Buffer), cur);
-            LOG_INFO(L"Found module {} at {}", cur->BaseDllName.Buffer, cur->DllBase);
             cur = reinterpret_cast<LDR_DATA_TABLE_ENTRY*>(cur->InLoadOrderLinks.Flink);
         }
 

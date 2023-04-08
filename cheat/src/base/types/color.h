@@ -31,6 +31,9 @@ struct clr4 {
     static clr4 red(uint8_t a = 255) noexcept { return clr4(255, 0, 0, a); }
     static clr4 green(uint8_t a = 255) noexcept { return clr4(0, 255, 0, a); }
     static clr4 blue(uint8_t a = 255) noexcept { return clr4(0, 0, 255, a); }
+    static clr4 cyan (uint8_t a = 255) noexcept { return clr4(0, 255, 255, a); }
+    static clr4 magenta (uint8_t a = 255) noexcept { return clr4(255, 0, 255, a); }
+    static clr4 yellow (uint8_t a = 255) noexcept { return clr4(255, 255, 0, a); }
 
     static clr4 lerp(const clr4& a, const clr4& b, float t) noexcept {
         return clr4(

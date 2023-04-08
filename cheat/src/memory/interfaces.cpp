@@ -65,7 +65,7 @@ static void find_interface(interface_holder<ty*>& ptr, dll& dll, std::string_vie
 {
     for (auto cur = get_interface_regs(dll); cur; cur = cur->next) {
         if (std::string(cur->name).starts_with(version_string)) {
-            LOG_SUCCESS("Found interface {}.", cur->name);
+            LOG_INFO("Found interface {}.", cur->name);
             ptr.template initialize<replace_vmt>(static_cast<ty*>(cur->create_fn()));
             return;
         }

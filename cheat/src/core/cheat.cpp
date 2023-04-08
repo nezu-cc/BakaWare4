@@ -1,15 +1,15 @@
 #include "cheat.h"
 
 void cheat::initialize(void* base) noexcept {
-    logger::initialize(L"csgo");
     dlls::initialize();
+    logger::initialize("BakaWare");
     interfaces::initialize();
     cheat::update_global_vars();
     render::initialize();
     hooks::initialize();
     // cfg::initialize();
 
-    LOG_SUCCESS("Chair initialized. Base: {} Last full build: {} {}", base, __DATE__, __TIME__);
+    LOG_ERROR("BakaWare initialized. Base: {} Last full build: {} {}", base, __DATE__, __TIME__);
 }
 
 DWORD cheat::end(LPVOID instance) noexcept {
