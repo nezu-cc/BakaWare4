@@ -12,7 +12,7 @@ namespace cheat {
     inline d2 screen_size{ };
     inline se::global_vars* global_vars{ };
 
-    void initialize() noexcept;
+    void initialize(void* base) noexcept;
     DWORD end(LPVOID instance) noexcept;
     void update_global_vars() noexcept;
 

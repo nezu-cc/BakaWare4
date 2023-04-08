@@ -9,7 +9,9 @@ namespace ch = std::chrono;
 
 #include "winapi.h"
 
-#define LOG_ENABLED
+#ifdef _DEBUG
+#define LOG_ENABLED 
+#endif
 
 #ifdef LOG_ENABLED
 #define LOG_SUCCESS(fmt, ...) logger::add<logger::level::success>(fmt, __VA_ARGS__)
@@ -130,6 +132,6 @@ namespace logger {
         fclose(stdout);
         FreeConsole();
     #endif
-}
+    }
 
 }

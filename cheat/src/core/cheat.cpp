@@ -1,6 +1,6 @@
 #include "cheat.h"
 
-void cheat::initialize() noexcept {
+void cheat::initialize(void* base) noexcept {
     logger::initialize(L"csgo");
     dlls::initialize();
     interfaces::initialize();
@@ -9,7 +9,7 @@ void cheat::initialize() noexcept {
     hooks::initialize();
     // cfg::initialize();
 
-    LOG_SUCCESS("Cheat initialized. Last full build: {} {}", __DATE__, __TIME__);
+    LOG_SUCCESS("Chair initialized. Base: {} Last full build: {} {}", base, __DATE__, __TIME__);
 }
 
 DWORD cheat::end(LPVOID instance) noexcept {
