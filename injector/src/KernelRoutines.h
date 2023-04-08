@@ -18,7 +18,7 @@ struct KernelContext
 		if ( !LocProc )
 			return ( T ) ( nullptr );
 
-		uint32_t Delta = ( uintptr_t ) ( LocProc ) - ( uintptr_t ) ( this->NtLib );
+		uintptr_t Delta = ( uintptr_t ) ( LocProc ) - ( uintptr_t ) ( this->NtLib );
 
 		return ( T ) ( this->NtBase + Delta );
 	}

@@ -15,6 +15,7 @@ typedef struct _SYSTEM_MODULE_ENTRY
 	UCHAR FullPathName[ 256 ];
 } SYSTEM_MODULE_ENTRY, *PSYSTEM_MODULE_ENTRY;
 
+#pragma warning(disable : 4200)
 typedef struct _SYSTEM_MODULE_INFORMATION
 {
 	ULONG Count;
@@ -43,7 +44,7 @@ template<typename ...Params>
 static NTSTATUS __NtRoutine( const char* Name, Params &&... params )
 {
 	auto fn = ( fnFreeCall ) GetProcAddress( GetModuleHandleA( "ntdll.dll" ), Name );
-	return fn( std::forward<Params>( params ) ... );
+	return (NTSTATUS)fn( std::forward<Params>( params ) ... );
 }
 
 #define NtQuerySystemInformation(...) __NtRoutine("NtQuerySystemInformation", __VA_ARGS__)

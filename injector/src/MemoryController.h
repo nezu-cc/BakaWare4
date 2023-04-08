@@ -401,16 +401,16 @@ static MemoryController Mc_InitContext( CapcomContext** CpCtxReuse = 0, KernelCo
 
 		while ( Range->NumberOfBytes.QuadPart )
 		{
-			Controller.PhysicalMemorySize = max( Controller.PhysicalMemorySize, Range->BaseAddress.QuadPart + Range->NumberOfBytes.QuadPart );
+			Controller.PhysicalMemorySize = max( Controller.PhysicalMemorySize, (ULONGLONG)(Range->BaseAddress.QuadPart + Range->NumberOfBytes.QuadPart) );
 			Range++;
 		}
 
 		HANDLE PhysicalMemoryHandle = 0;
-		Controller.CreationStatus = Khk_CallPassive( k_ZwOpenSection, &PhysicalMemoryHandle, uint64_t( SECTION_ALL_ACCESS ), &PhysicalMemoryAttributes );
+		Controller.CreationStatus = (NTSTATUS)Khk_CallPassive( k_ZwOpenSection, &PhysicalMemoryHandle, uint64_t( SECTION_ALL_ACCESS ), &PhysicalMemoryAttributes );
 
 		if ( !Controller.CreationStatus )
 		{
-			Controller.CreationStatus = Khk_CallPassive
+			Controller.CreationStatus = (NTSTATUS)Khk_CallPassive
 			(
 				k_ZwMapViewOfSection,
 				PhysicalMemoryHandle,
@@ -442,7 +442,7 @@ static MemoryController Mc_InitContext( CapcomContext** CpCtxReuse = 0, KernelCo
 				for ( int i = 0; i < 0x600; i += 0x8 )
 				{
 					uint64_t* Ptr = (uint64_t*)(Controller.CurrentEProcess + i);
-					if ( !Controller.UniqueProcessIdOffset && Ptr[ 0 ] & 0xFFFFFFFF == Pid && ( Ptr[ 1 ] > 0xffff800000000000 ) && ( Ptr[ 2 ] > 0xffff800000000000 ) && ( ( Ptr[ 1 ] & 0xF ) == ( Ptr[ 2 ] & 0xF ) ) )
+					if ( !Controller.UniqueProcessIdOffset && (Ptr[ 0 ] & 0xFFFFFFFF) == Pid && ( Ptr[ 1 ] > 0xffff800000000000 ) && ( Ptr[ 2 ] > 0xffff800000000000 ) && ( ( Ptr[ 1 ] & 0xF ) == ( Ptr[ 2 ] & 0xF ) ) )
 					{
 						Controller.UniqueProcessIdOffset = i;
 						Controller.ActiveProcessLinksOffset = Controller.UniqueProcessIdOffset + 0x8;
@@ -463,7 +463,7 @@ static MemoryController Mc_InitContext( CapcomContext** CpCtxReuse = 0, KernelCo
 	if ( !Controller.DirectoryTableBaseOffset )
 		Controller.CreationStatus = 2;
 
-	printf( "[+] PhysicalMemoryBegin: %16llx\n", Controller.PhysicalMemoryBegin );
+	printf( "[+] PhysicalMemoryBegin: %16llx\n", (uintptr_t)Controller.PhysicalMemoryBegin );
 	printf( "[+] PhysicalMemorySize:  %16llx\n", Controller.PhysicalMemorySize );
 
 	printf( "[+] CurrentProcessCr3:   %16llx\n", Controller.CurrentDirectoryBase );
@@ -473,7 +473,7 @@ static MemoryController Mc_InitContext( CapcomContext** CpCtxReuse = 0, KernelCo
 	printf( "[+] UniqueProcessId@     %16llx\n", Controller.UniqueProcessIdOffset );
 	printf( "[+] ActiveProcessLinks@  %16llx\n", Controller.ActiveProcessLinksOffset );
 
-	printf( "[+] Status:              %16llx\n", Controller.CreationStatus );
+	printf( "[+] Status:              %16lx\n", Controller.CreationStatus );
 
 	Controller.TargetDirectoryBase = Controller.CurrentDirectoryBase;
 

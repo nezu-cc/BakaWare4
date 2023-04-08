@@ -2,6 +2,7 @@
 #include <Windows.h>
 #include <iostream>
 
+#undef ERROR
 #define ERROR( msg ) \
 {SetConsoleTextAttribute( GetStdHandle( STD_OUTPUT_HANDLE ), 12 ); \
 printf( "\n[[[[[[        " msg "        ]]]]]]\n\n" ); \

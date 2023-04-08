@@ -72,7 +72,7 @@ static NTSTATUS Dl_AddServiceToRegistery( const wchar_t* DriverName )
 							   0,
 							   REG_EXPAND_SZ,
 							   ( PBYTE ) Data.c_str(),
-							   Data.size() * sizeof( wchar_t ) );
+							   (DWORD)Data.size() * sizeof( wchar_t ) );
 	};
 	const auto RegWriteDWORD = [ = ] ( const wchar_t* Name, DWORD Data ) -> NTSTATUS
 	{
@@ -112,8 +112,8 @@ static NTSTATUS Dl_UnloadDriver( const wchar_t* DriverName )
 
 	UNICODE_STRING SourceRegistryUnicode = { 0 };
 	SourceRegistryUnicode.Buffer = ( wchar_t* ) SourceRegistry.c_str();
-	SourceRegistryUnicode.Length = ( SourceRegistry.size() ) * 2;
-	SourceRegistryUnicode.MaximumLength = ( SourceRegistry.size() + 1 ) * 2;
+	SourceRegistryUnicode.Length = (USHORT)( SourceRegistry.size() ) * 2;
+	SourceRegistryUnicode.MaximumLength = (USHORT)( SourceRegistry.size() + 1 ) * 2;
 
 	NTSTATUS Status = NtUnloadDriver( &SourceRegistryUnicode );
 
@@ -137,8 +137,8 @@ static NTSTATUS Dl_LoadDriver( const wchar_t* DriverName )
 
 	UNICODE_STRING SourceRegistryUnicode = { 0 };
 	SourceRegistryUnicode.Buffer = ( wchar_t* ) SourceRegistry.c_str();
-	SourceRegistryUnicode.Length = ( SourceRegistry.size() ) * 2;
-	SourceRegistryUnicode.MaximumLength = ( SourceRegistry.size() + 1 ) * 2;
+	SourceRegistryUnicode.Length = (USHORT)( SourceRegistry.size() ) * 2;
+	SourceRegistryUnicode.MaximumLength = (USHORT)( SourceRegistry.size() + 1 ) * 2;
 
 	NTSTATUS Status = NtLoadDriver( &SourceRegistryUnicode );
 
@@ -172,7 +172,7 @@ static HANDLE Dl_OpenDevice( std::string DriverName )
 	if ( DeviceHandle == INVALID_HANDLE_VALUE )
 		DeviceHandle = 0;
 
-	printf( "[+] CreateFileA(%s) returned %08x\n", CompleteDeviceName, DeviceHandle );
+	printf( "[+] CreateFileA(%s) returned %08llx\n", CompleteDeviceName, (uintptr_t)DeviceHandle );
 
 	return DeviceHandle;
 }

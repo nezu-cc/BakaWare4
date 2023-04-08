@@ -55,7 +55,7 @@ static void * Mp_RvaToPointer( BYTE* Image, DWORD Va )
 
 static void Mp_PushBytes( std::vector<BYTE>& Target, const std::vector<BYTE>& Bytes )
 {
-	int i = Target.size();
+	size_t i = Target.size();
 	Target.resize( i + Bytes.size() );
 	memcpy( &Target[ i ], &Bytes[ 0 ], Bytes.size() );
 }
@@ -97,7 +97,7 @@ static std::vector<BYTE> Mp_CreateImportShell( BYTE* Image, PVOID MappedAdr, boo
 		IMAGE_THUNK_DATA * Thunk = NULL;
 		IMAGE_THUNK_DATA * Func = NULL;
 
-		uint32_t ModuleNameOffset = DataContainer.size();
+		size_t ModuleNameOffset = DataContainer.size();
 
 		do
 			DataContainer.push_back( *ModuleName );
@@ -110,7 +110,7 @@ static std::vector<BYTE> Mp_CreateImportShell( BYTE* Image, PVOID MappedAdr, boo
 			0x48, 0x89, 0xC6                           // mov    rsi,rax
 		};
 
-		*( uint32_t* ) ( &ModulePusher[ 3 ] ) = ModuleNameOffset;
+		*( uint32_t* ) ( &ModulePusher[ 3 ] ) = (uint32_t)ModuleNameOffset;
 
 		Mp_PushBytes( Out, ModulePusher );
 
@@ -135,16 +135,16 @@ static std::vector<BYTE> Mp_CreateImportShell( BYTE* Image, PVOID MappedAdr, boo
 			PCHAR ImportName = ( PCHAR ) ImageImportByName->Name;
 			ULONGLONG* Target = &Func->u1.Function;
 
-			uint32_t ImportNameOffset = DataContainer.size();
+			size_t ImportNameOffset = DataContainer.size();
 
-			if ( !strcmpi( ImportName, "AddVectoredExceptionHandler" ) )
+			if ( !_strcmpi( ImportName, "AddVectoredExceptionHandler" ) )
 				printf( "\n[+] WARNING: Vectored Exception Handling IS NOT SUPPORTED!\n\n" );
 
 			do
 				DataContainer.push_back( *ImportName );
 			while ( *ImportName++ );
 
-			uint32_t OffsetOffset = DataContainer.size();
+			size_t OffsetOffset = DataContainer.size();
 			DataContainer.resize( DataContainer.size() + 8 );
 			*( uint64_t* ) ( &DataContainer[ OffsetOffset ] ) = ( uint64_t ) Target;
 
@@ -157,8 +157,8 @@ static std::vector<BYTE> Mp_CreateImportShell( BYTE* Image, PVOID MappedAdr, boo
 				0x48, 0x89, 0x03                           // mov    QWORD PTR [rbx],rax
 			};
 
-			*( uint32_t* ) ( &ImportFixer[ 6 ] ) = ImportNameOffset;
-			*( uint32_t* ) ( &ImportFixer[ 16 ] ) = OffsetOffset;
+			*( uint32_t* ) ( &ImportFixer[ 6 ] ) = (uint32_t)ImportNameOffset;
+			*( uint32_t* ) ( &ImportFixer[ 16 ] ) = (uint32_t)OffsetOffset;
 
 			Mp_PushBytes( Out, ImportFixer );
 
@@ -167,11 +167,11 @@ static std::vector<BYTE> Mp_CreateImportShell( BYTE* Image, PVOID MappedAdr, boo
 	}
 
 	Mp_PushBytes( Out, { 0x48, 0x83, 0xC4, 0x38 } ); // add rsp, 0x38
-	uint32_t JmpSize = Out.size();
+	size_t JmpSize = Out.size();
 	Mp_PushBytes( Out, { 0xE9, 0x00, 0x00, 0x00, 0x00 } ); // jmp 0xAABBCCDD
-	*( uint32_t* ) ( &Out[ 7 ] ) = Out.size() - 0xB;
+	*( uint32_t* ) ( &Out[ 7 ] ) = (uint32_t)Out.size() - 0xB;
 	Mp_PushBytes( Out, DataContainer );
-	*( int32_t* ) ( &Out[ JmpSize + 1 ] ) = DataContainer.size();
+	*( int32_t* ) ( &Out[ JmpSize + 1 ] ) = (int32_t)DataContainer.size();
 	return Out;
 }
 
@@ -195,9 +195,9 @@ static void Mp_RelocateImage( BYTE* Image, BYTE* Target )
 		ZeroMemory( Target + VirtualAddress, VirtSize );
 		memcpy( Target + VirtualAddress, Image + RawData, RawSize );
 
-		if ( !strcmpi( Name, ".pdata" ) )
+		if ( !_strcmpi( Name, ".pdata" ) )
 			printf( "\n[+] WARNING: Structured Exception Handling IS NOT SUPPORTED!\n\n" );
-		if ( !strcmpi( Name, ".tls" ) )
+		if ( !_strcmpi( Name, ".tls" ) )
 			printf( "\n[+] WARNING: Thread-local Storage IS NOT SUPPORTED!\n\n" );
 	}
 
@@ -209,7 +209,7 @@ static void Mp_RelocateImage( BYTE* Image, BYTE* Target )
 		PIMAGE_BASE_RELOCATION Reloc = ( PIMAGE_BASE_RELOCATION ) ( Target + FileHeader->OptionalHeader.DataDirectory[ IMAGE_DIRECTORY_ENTRY_BASERELOC ].VirtualAddress );
 		DWORD RelocSize = FileHeader->OptionalHeader.DataDirectory[ IMAGE_DIRECTORY_ENTRY_BASERELOC ].Size;
 		uint64_t Delta = (uint64_t)Target - FileHeader->OptionalHeader.ImageBase;
-		int c = 0;
+		DWORD c = 0;
 		while ( c < RelocSize )
 		{
 			size_t p = sizeof( IMAGE_BASE_RELOCATION );
@@ -328,7 +328,7 @@ static TlsLockedHookController* Mp_MapDllAndCreateHookEntry( const std::string& 
 	};
 
 	printf( "[+] Creating import shellcode...\n" );
-	uint32_t ShellSize = Mp_CreateImportShell( File.data(), nullptr, LoadLib ).size() + JmpEntryPont.size() + Prologue.size();
+	size_t ShellSize = Mp_CreateImportShell( File.data(), nullptr, LoadLib ).size() + JmpEntryPont.size() + Prologue.size();
 
 	BYTE* Memory = ( BYTE* ) MemoryAllocator( OptionalHeader->SizeOfImage + ShellSize + 0xFFF );
 

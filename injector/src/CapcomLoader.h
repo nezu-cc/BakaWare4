@@ -111,8 +111,8 @@ static NTSTATUS Cl_RemoveSimilarDrivers( BYTE* Driver )
 
 				if ( !Deleted )
 				{
-					int StrEnd = Path.find( L".sys" );
-					int StrStart = Path.rfind( L"\\", StrEnd );
+					size_t StrEnd = Path.find( L".sys" );
+					size_t StrStart = Path.rfind( L"\\", StrEnd );
 					std::wstring DriverName = Path.substr( StrStart + 1, StrEnd - StrStart - 1 ).c_str();
 					Dl_UnloadDriver( DriverName.c_str() );
 
@@ -148,7 +148,7 @@ static CapcomContext* Cl_InitContext()
 
 	std::wstring CapcomDriverName = L"";
 
-	srand( __rdtsc() );
+	srand( (DWORD)__rdtsc() );
 	
 	for ( int i = 0; i < 12; i++ )
 		CapcomDriverName += wchar_t( L'A' + rand() % 20 );

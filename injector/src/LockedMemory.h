@@ -4,7 +4,7 @@
 #include "NtDefines.h"
 
 #pragma section(".LDATA", read, write)
-#pragma section(".LTEXT", read, write, execute)
+#pragma section(".LTEXT", read, execute)
 
 #pragma data_seg(".LDATA$1")
 #pragma data_seg(".LDATA$2")
@@ -43,7 +43,7 @@ static BOOL Np_TryIncreaseWorkingSetSize( SIZE_T Size )
 		return FALSE;
 	if ( !SetProcessWorkingSetSize( NtCurrentProcess(), Min + Size, Max + Size ) )
 		return FALSE;
-	printf( "[+] Increasing working set (%d KB, %d KB) -> (%d KB, %d KB)!\n", Min / 1024, Max / 1024, ( Min + Size ) / 1024, ( Max + Size ) / 1024 );
+	printf( "[+] Increasing working set (%llu KB, %llu KB) -> (%llu KB, %llu KB)!\n", Min / 1024u, Max / 1024u, ( Min + Size ) / 1024u, ( Max + Size ) / 1024u );
 	return TRUE;
 }
 
@@ -67,12 +67,12 @@ static BOOL Np_LockRange( PVOID From, PVOID To )
 	{
 		if ( !Np_TryLockPage( Current ) )
 		{
-			printf( "[+] Failed locking %16llx!\n", Current );
+			printf( "[+] Failed locking %16llx!\n", (uintptr_t)Current );
 			return FALSE;
 		}
 		else
 		{
-			printf( "[+] Locked %16llx successfully!\n", From );
+			printf( "[+] Locked %16llx successfully!\n", (uintptr_t)From );
 		}
 	}
 	return TRUE;
@@ -80,8 +80,8 @@ static BOOL Np_LockRange( PVOID From, PVOID To )
 
 static BOOL Np_LockSections()
 {
-	printf( "[+] .LDATA: %16llx -> %16llx!\n", &Np_DataStart, &Np_DataEnd );
-	printf( "[+] .LTEXT: %16llx -> %16llx!\n", &Np_TextStart, &Np_TextEnd );
+	printf( "[+] .LDATA: %16llx -> %16llx!\n", (uintptr_t)&Np_DataStart, (uintptr_t)&Np_DataEnd );
+	printf( "[+] .LTEXT: %16llx -> %16llx!\n", (uintptr_t)&Np_TextStart, (uintptr_t)&Np_TextEnd );
 
 	return
 		Np_LockRange( &Np_DataStart, &Np_DataEnd ) &&

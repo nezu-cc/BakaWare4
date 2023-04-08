@@ -101,7 +101,7 @@ uint32_t FindProcess( const std::string& Name )
 	{
 		do
 		{
-			if ( !stricmp( ProcessEntry.szExeFile, Name.data() ) )
+			if ( !_stricmp( ProcessEntry.szExeFile, Name.data() ) )
 			{
 				CloseHandle( ProcessSnapshot );
 				return ProcessEntry.th32ProcessID;
@@ -218,7 +218,7 @@ int main( int argc, char**argv )
 
 	printf( "Waiting for %s...\n", ProcessName.data() );
 
-	uint64_t Pid = 0;
+	uint32_t Pid = 0;
 	while ( !Pid )
 	{
 		Pid = FindProcess( ProcessName );
@@ -240,7 +240,7 @@ int main( int argc, char**argv )
 	// Expose region to process
 	for ( auto Region : UsedRegions )
 	{
-		printf( "[-] Exposing %16llx (%08x bytes) to pid:%6llx\n", Region.first, Region.second, Pid );
+		printf( "[-] Exposing %16llx (%08llx bytes) to pid:%6x\n", (uintptr_t)Region.first, Region.second, Pid );
 		ExposeKernelMemoryToProcess( Controller, Region.first, Region.second, EProcess );
 	}
 
@@ -259,19 +259,19 @@ int main( int argc, char**argv )
 	if ( !PadSpace )
 		ERROR( "Couldn't Find Appropriate Padding" );
 
-	printf( "[-] Hooking TlsGetValue @                   %16llx\n", _TlsGetValue );
-	printf( "[-] TlsGetValue Redirection Target:         %16llx\n", Target );
-	printf( "[-] Stub located at:                        %16llx\n", PadSpace );
-	printf( "[-] Image located at:                       %16llx\n", TlsHookController );
+	printf( "[-] Hooking TlsGetValue @                   %16llx\n", (uintptr_t)_TlsGetValue );
+	printf( "[-] TlsGetValue Redirection Target:         %16llx\n", (uintptr_t)Target );
+	printf( "[-] Stub located at:                        %16llx\n", (uintptr_t)PadSpace );
+	printf( "[-] Image located at:                       %16llx\n", (uintptr_t)TlsHookController );
 
-	*( uint32_t* ) ( &PidBasedHook[ 0xD ] ) = Pid; // Pid
-	*( int32_t* ) ( &PidBasedHook[ 0x13 ] ) = Target - ( PadSpace + 0x17 ); // Jmp
+	*( uint32_t* ) ( &PidBasedHook[ 0xD ] ) = (uint32_t)Pid; // Pid
+	*( int32_t* ) ( &PidBasedHook[ 0x13 ] ) = (int32_t)( Target - ( PadSpace + 0x17 ) ); // Jmp
 	*( PUCHAR* ) ( &PidBasedHook[ 0x19 ] ) = &TlsHookController->EntryBytes; // Hook target
 
 																			 // Backup and complete hook
 	BYTE Jmp[ 5 ];
 	Jmp[ 0 ] = 0xE9;
-	*( int32_t* ) ( Jmp + 1 ) = PadSpace - ( _TlsGetValue + 5 );
+	*( int32_t* ) ( Jmp + 1 ) = (int32_t)( PadSpace - ( _TlsGetValue + 5 ) );
 
 	std::vector<BYTE> Backup1( PidBasedHook.size(), 0 );
 	std::vector<BYTE> Backup2( 5, 0 );
@@ -316,7 +316,7 @@ int main( int argc, char**argv )
 	uint64_t TStart = GetTickCount64();
 	while ( !Controller.ReadVirtual<BYTE>( &TlsHookController->NumThreadsWaiting ) && !( GetAsyncKeyState( VK_F1 ) & 0x8000 ) && ( ( GetTickCount64() - TStart ) < 5000 ) )
 		Sleep( 1 );
-	printf( "[-] Threads spinning:                       %16llx\n", TlsHookController->NumThreadsWaiting );
+	printf( "[-] Threads spinning:                       %16x\n", TlsHookController->NumThreadsWaiting );
 
 	// Restore Backup
 
@@ -335,5 +335,6 @@ int main( int argc, char**argv )
 	Controller.AttachIfCanRead( EProcess, PadSpace );
 	Controller.WriteVirtual( Backup1.data(), PadSpace, PidBasedHook.size() );
 
-	return system( "pause" );
+	// return system( "pause" );
+    return 0;
 }
