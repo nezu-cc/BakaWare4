@@ -1,5 +1,22 @@
 #include "cheat.h"
 
+LONG CALLBACK veh_handler(EXCEPTION_POINTERS* ExceptionInfo) {
+	auto exception_code = ExceptionInfo->ExceptionRecord->ExceptionCode;
+	auto exception_info0 = ExceptionInfo->ExceptionRecord->ExceptionInformation[0];
+	auto exception_info1 = ExceptionInfo->ExceptionRecord->ExceptionInformation[1];
+
+    if (exception_code == EXCEPTION_ACCESS_VIOLATION) {
+        // DEP Violation
+        if (exception_info0 == 8) {
+            // ignore DEP violation above 0x7FFFFFFEFFFF
+            if (exception_info1 >= 0x7FFFFFFEFFFF)
+                return EXCEPTION_CONTINUE_EXECUTION;
+        }
+    }
+
+	return EXCEPTION_CONTINUE_SEARCH;
+}
+
 void cheat::initialize(uintptr_t base) noexcept {
     dlls::initialize();
     logger::initialize(XOR("BakaWare"));
@@ -10,6 +27,12 @@ void cheat::initialize(uintptr_t base) noexcept {
     render::initialize();
     hooks::initialize();
     // cfg::initialize();
+
+    // bypass DEP if mapped above 0x7FFFFFFEFFFF
+    if (base >= 0x7FFFFFFEFFFF) {
+        PVOID handle = AddVectoredExceptionHandler(FALSE, veh_handler);
+        LOG_INFO(XOR("BEP bypass handler at: {}"), handle);
+    }
 
     LOG_ERROR(XOR("BakaWare initialized. Base: {} Last full build: {} {}"), (void*)base, __DATE__, __TIME__);
 }
