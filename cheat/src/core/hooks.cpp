@@ -11,7 +11,7 @@ void hooks::initialize() noexcept
     if (render::game_window)
         original_wnd_proc = reinterpret_cast<WNDPROC>(SetWindowLongPtr(render::game_window, GWLP_WNDPROC, reinterpret_cast<LONG_PTR>(wnd_proc)));
     else
-        LOG_ERROR("Failed to hook window proc, game window HWND missing!");
+        LOG_ERROR(XOR("Failed to hook window proc, game window HWND missing!"));
 
     // hook_func = dlls::cs2.find(PATTERN("48 8B C4 48 89 58 08 48 89 70 10 57")).cast<decltype(hook_func)>();
     // unhook_func = dlls::cs2.find(PATTERN("48 85 C9 0F 84 94")).cast<decltype(unhook_func)>();
@@ -26,7 +26,7 @@ void hooks::initialize() noexcept
     SET_VT_HOOK(interfaces::input_system, relative_mouse_mode, 76);
     SET_VT_HOOK(interfaces::client_mode, level_init, 23);
 
-    LOG_INFO("Hooks initialized.");
+    LOG_INFO(XOR("Hooks initialized."));
 }
 
 void hooks::end() noexcept {

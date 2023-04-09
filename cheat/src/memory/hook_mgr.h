@@ -22,7 +22,7 @@ namespace hooks {
     template<class ty, class fn>
     void set(interface_holder<ty*>& vmt, int index, void* hook, fn& original) noexcept
     {
-        ASSERT_MSG(vmt.replacement_vmt, "Trying to set hook with replace_vmt = false!");
+        ASSERT_MSG(vmt.replacement_vmt, XOR("Trying to set hook with replace_vmt = false!"));
         vmt.replacement_vmt[index + 1] = reinterpret_cast<uintptr_t>(hook);
         original = reinterpret_cast<fn>(vmt.real_vmt[index]);
     };
@@ -44,7 +44,7 @@ namespace hooks {
     //     hooked_fns[hook] = target;
     //     *original = hook_func(target, hook, false);
     //     if (!*original)
-    //         LOG_ERROR("Error while hooking function!"); /* Not fatal, but we should warn about it */
+    //         LOG_ERROR(XOR("Error while hooking function!")); /* Not fatal, but we should warn about it */
     // };
 
 }

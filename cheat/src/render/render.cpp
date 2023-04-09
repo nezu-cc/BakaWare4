@@ -85,7 +85,7 @@ void render::initialize() noexcept {
 	style.WindowTitleAlign = ImVec2(0.5f, 0.5f);
 	style.GrabMinSize = 20.f;
 
-    LOG_INFO("Render initialized.");
+    LOG_INFO(XOR("Render initialized."));
 }
 
 bool render::set_swap_chain(IDXGISwapChain* swap_chain) noexcept {
@@ -93,13 +93,13 @@ bool render::set_swap_chain(IDXGISwapChain* swap_chain) noexcept {
 
     DXGI_SWAP_CHAIN_DESC swapChainDesc;
     if (FAILED(swap_chain->GetDesc(&swapChainDesc))) {
-        LOG_ERROR("Failed to get swap chain description.");
+        LOG_ERROR(XOR("Failed to get swap chain description."));
         return false;
     }
     game_window = swapChainDesc.OutputWindow;
 
     if (FAILED(swap_chain->GetDevice(__uuidof(ID3D11Device), reinterpret_cast<PVOID*>(&device)))) {
-        LOG_ERROR("Failed to get device from swap chain.");
+        LOG_ERROR(XOR("Failed to get device from swap chain."));
         return false;
     }
 
@@ -107,7 +107,7 @@ bool render::set_swap_chain(IDXGISwapChain* swap_chain) noexcept {
 
     ID3D11Texture2D* back_buffer;
     if (FAILED(swap_chain->GetBuffer(0, __uuidof(ID3D11Texture2D), reinterpret_cast<PVOID*>(&back_buffer)))) {
-        LOG_ERROR("Failed to get buffer from swap chain.");
+        LOG_ERROR(XOR("Failed to get buffer from swap chain."));
         return false;
     }
 
@@ -117,7 +117,7 @@ bool render::set_swap_chain(IDXGISwapChain* swap_chain) noexcept {
 
     if (FAILED(device->CreateRenderTargetView(back_buffer, &desc, &render_target_view))) {
         back_buffer->Release();
-        LOG_ERROR("Failed to create render target view.");
+        LOG_ERROR(XOR("Failed to create render target view."));
         return false;
     }
     back_buffer->Release();

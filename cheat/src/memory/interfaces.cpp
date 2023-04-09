@@ -14,17 +14,17 @@ void interfaces::initialize() noexcept
     collect_interfaces(dlls::schemasystem);
     collect_interfaces(dlls::input_system);
 
-    get_cached_interface(client, "Source2Client002");
-    get_cached_interface(engine, "Source2EngineToClient001");
-    get_cached_interface(game_resource, "GameResourceServiceClientV001");
-    get_cached_interface(schema_system, "SchemaSystem_001");
-    get_cached_interface<true>(input_system, "InputSystemVersion001");
+    get_cached_interface(client, XOR("Source2Client002"));
+    get_cached_interface(engine, XOR("Source2EngineToClient001"));
+    get_cached_interface(game_resource, XOR("GameResourceServiceClientV001"));
+    get_cached_interface(schema_system, XOR("SchemaSystem_001"));
+    get_cached_interface<true>(input_system, XOR("InputSystemVersion001"));
 
     entity_list.initialize(game_resource->get_entity_list());
     csgo_input.initialize<true>(*dlls::client.find(PATTERN("48 8B 0D ? ? ? ? 48 8B 01 FF 50 ? 8B DF")).absolute<se::csgo_input**>(3));
     client_mode.initialize<true>(dlls::client.find(PATTERN("48 8D 0D ? ? ? ? 48 69 C0 ? ? ? ? 48 03 C1 C3 CC CC")).absolute<se::client_mode*>(3));
 
-    LOG_INFO("Interfaces initialized.");
+    LOG_INFO(XOR("Interfaces initialized."));
 }
 
 namespace se {
@@ -53,7 +53,7 @@ static auto get_interface_regs(dll& dll) noexcept
 static void collect_interfaces(dll& dll) noexcept
 {
     for (auto cur = get_interface_regs(dll); cur; cur = cur->next) {
-        LOG_INFO("{}: found interface {}", dll.name, cur->name);
+        LOG_INFO(XOR("{}: found interface: {}"), dll.name, cur->name);
         interfaces::list.push_back(std::make_pair(cur->name, cur->create_fn()));
     }
 }
@@ -65,7 +65,7 @@ static void find_interface(interface_holder<ty*>& ptr, dll& dll, std::string_vie
 {
     for (auto cur = get_interface_regs(dll); cur; cur = cur->next) {
         if (std::string(cur->name).starts_with(version_string)) {
-            LOG_INFO("Found interface {}.", cur->name);
+            LOG_INFO(XOR("Found interface: {}"), cur->name);
             ptr.template initialize<replace_vmt>(static_cast<ty*>(cur->create_fn()));
             return;
         }

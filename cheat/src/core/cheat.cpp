@@ -2,14 +2,14 @@
 
 void cheat::initialize(void* base) noexcept {
     dlls::initialize();
-    logger::initialize("BakaWare");
+    logger::initialize(XOR("BakaWare"));
     interfaces::initialize();
     cheat::update_global_vars();
     render::initialize();
     hooks::initialize();
     // cfg::initialize();
 
-    LOG_ERROR("BakaWare initialized. Base: {} Last full build: {} {}", base, __DATE__, __TIME__);
+    LOG_ERROR(XOR("BakaWare initialized. Base: {} Last full build: {} {}"), (void*)base, __DATE__, __TIME__);
 }
 
 DWORD cheat::end(LPVOID instance) noexcept {
@@ -24,6 +24,6 @@ void cheat::update_global_vars() noexcept {
     static auto global_vars = dlls::client.find(PATTERN("48 89 15 ? ? ? ? 48 8D 05 ? ? ? ? 48 85")).absolute<se::global_vars**>(0x3);
     if (cheat::global_vars != *global_vars) {
         cheat::global_vars = *global_vars;
-        LOG_INFO("Global vars updated: {}", (void*)cheat::global_vars);
+        LOG_INFO(XOR("Global vars updated: {}"), (void*)cheat::global_vars);
     }
 }

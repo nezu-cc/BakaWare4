@@ -21,13 +21,13 @@ namespace menu {
 
     class menu_tab_visuals : public menu_tab {
     public:
-        menu_tab_visuals() noexcept : menu_tab("Visuals") { };
+        menu_tab_visuals() noexcept : menu_tab(XOR("Visuals")) { };
         void render() noexcept override;
     };
 
     class menu_tab_misc : public menu_tab {
     public:
-        menu_tab_misc() noexcept : menu_tab("Misc") { };
+        menu_tab_misc() noexcept : menu_tab(XOR("Misc")) { };
         void render() noexcept override;
     };
 

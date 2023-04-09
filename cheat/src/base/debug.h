@@ -10,9 +10,9 @@ static void dbg_fail(std::string_view fn, std::string_view msg = "") noexcept
 {
 #ifdef _DEBUG
     if (msg.empty())
-        LOG_ERROR("An error occurred in {}!", fn);
+        LOG_ERROR(XOR("An error occurred in {}!"), fn);
     else
-        LOG_ERROR("{} ({})", msg, fn);
+        LOG_ERROR(XOR("{} ({})"), msg, fn);
     assert(false);
 #else
     std::abort();
@@ -24,5 +24,5 @@ static void dbg_fail(std::string_view fn, std::string_view msg = "") noexcept
 #else
 #define FUNCTION_NAME __FUNCTION__
 #endif
-#define ASSERT(expr) do { if (!(expr)) dbg_fail(FUNCTION_NAME); } while (false)
-#define ASSERT_MSG(expr, msg) do { if (!(expr)) dbg_fail(FUNCTION_NAME, msg); } while (false)
+#define ASSERT(expr) do { if (!(expr)) dbg_fail(XOR(FUNCTION_NAME)); } while (false)
+#define ASSERT_MSG(expr, msg) do { if (!(expr)) dbg_fail(XOR(FUNCTION_NAME), msg); } while (false)

@@ -36,7 +36,7 @@ struct dll {
             }
         }
 
-        LOG_ERROR("{}: did not find pattern {}", name, [&]()
+        LOG_ERROR(XOR("{}: did not find pattern {}"), name, [&]()
         {
             /* Slow, but this only runs when something goes wrong. */
             std::stringstream ss{ };
@@ -75,15 +75,15 @@ struct dll {
 
 namespace dlls {
 
-    inline dll cs2{ "cs2.exe" };
-    inline dll tier0{ "tier0.dll" };
-    inline dll sdl2{ "SDL2.dll" };
-    inline dll game_overlay_renderer64{ "gameoverlayrenderer64.dll" };
-    inline dll render_system_dx11{ "rendersystemdx11.dll" };
-    inline dll client{ "client.dll" };
-    inline dll engine2{ "engine2.dll" };
-    inline dll schemasystem{ "schemasystem.dll" };
-    inline dll input_system{ "inputsystem.dll" };
+    inline dll cs2{ XOR("cs2.exe") };
+    inline dll tier0{ XOR("tier0.dll") };
+    inline dll sdl2{ XOR("SDL2.dll") };
+    inline dll game_overlay_renderer64{ XOR("gameoverlayrenderer64.dll") };
+    inline dll render_system_dx11{ XOR("rendersystemdx11.dll") };
+    inline dll client{ XOR("client.dll") };
+    inline dll engine2{ XOR("engine2.dll") };
+    inline dll schemasystem{ XOR("schemasystem.dll") };
+    inline dll input_system{ XOR("inputsystem.dll") };
 
     inline void initialize() noexcept
     {
@@ -112,7 +112,7 @@ namespace dlls {
 
         for (auto entry : list) {
             const auto res = loaded.find(fnv1a::hash(entry->name));
-            ASSERT_MSG(res != loaded.cend(), "DLL not loaded yet?");
+            ASSERT_MSG(res != loaded.cend(), XOR("DLL not loaded yet?"));
             const auto dll = res->second;
             entry->base = reinterpret_cast<uintptr_t>(dll->DllBase);
             entry->size = dll->SizeOfImage;

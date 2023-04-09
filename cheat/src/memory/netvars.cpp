@@ -5,16 +5,16 @@ using NetvarKeyValueMap_t = std::unordered_map<uint32_t, int16_t>;
 using NetvarTableMap_t = std::unordered_map<uint32_t, NetvarKeyValueMap_t>;
 
 static bool init_netvars_for_class(NetvarTableMap_t& table_map, const char* class_name, uint32_t class_key) noexcept {
-    auto type = interfaces::schema_system->find_type_scope_for_module("client.dll");
+    auto type = interfaces::schema_system->find_type_scope_for_module(XOR("client.dll"));
     if (!type) {
-        LOG_ERROR("init_netvars_for_class: type scope not found for module client.dll");
+        LOG_ERROR(XOR("init_netvars_for_class: type scope not found for module client.dll"));
         return false;
     }
 
     auto class_info = type->find_declared_class(class_name);
     if (!class_info) {
         table_map.emplace(class_key, NetvarKeyValueMap_t{});
-        LOG_ERROR("init_netvars_for_class: class {} not found", class_name);
+        LOG_ERROR(XOR("init_netvars_for_class: class {} not found"), class_name);
         return false;
     }
 
@@ -43,11 +43,11 @@ uintptr_t netvars::get_offset(const char *class_name, uint32_t class_key, const 
     const auto& kv_map = table_map_it->second;
     const auto& kv_map_it = kv_map.find(member_key);
     if (kv_map_it == kv_map.cend()) {
-        LOG_ERROR("netvars::get_offset: member {} not found in class {}", member_name, class_name);
+        LOG_ERROR(XOR("netvars::get_offset: member {} not found in class {}"), member_name, class_name);
         return 0;
     }
 
-    LOG_INFO("resolved netvar offset {}::{} -> {}", class_name, member_name, kv_map_it->second);
+    LOG_INFO(XOR("resolved netvar offset {}::{} -> {}"), class_name, member_name, kv_map_it->second);
 
     return kv_map_it->second;
 }

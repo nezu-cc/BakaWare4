@@ -23,3 +23,4 @@ using namespace std::chrono_literals;
 #include "types/pattern.h"
 #include "types/vector.h"
 #include "types/bounding_box.h"
+#include "../crypt/xorstr.h"

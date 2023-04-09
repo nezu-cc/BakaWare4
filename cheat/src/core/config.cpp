@@ -7,5 +7,5 @@ void config::load(std::wstring_view file) noexcept {}
 
 void config::save(std::wstring_view file) noexcept {
     json j = cfg;
-    LOG_INFO("config: {}", j.dump(2));
+    LOG_INFO(XOR("config: {}"), j.dump(2));
 }

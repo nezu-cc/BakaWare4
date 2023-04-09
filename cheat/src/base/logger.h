@@ -9,6 +9,7 @@ namespace ch = std::chrono;
 
 #include "winapi.h"
 #include "types/color.h"
+#include "../crypt/xorstr.h"
 
 // #define EXTERNAL_CONSOLE 
 
@@ -99,12 +100,12 @@ namespace logger {
         AttachConsole(ATTACH_PARENT_PROCESS);
         SetConsoleTitleA(console_title.data());
 
-        freopen_s(reinterpret_cast<FILE**>(stdout), "CONOUT$", "w", stdout);
+        freopen_s(reinterpret_cast<FILE**>(stdout), XOR("CONOUT$"), XOR("w"), stdout);
         console = GetStdHandle(STD_OUTPUT_HANDLE);
     #else
         valve_logger::initialize(console_title.data());
     #endif
-        LOG_INFO("Logger initialized.");
+        LOG_INFO(XOR("Logger initialized."));
     }
 
     inline void end() noexcept

@@ -2,6 +2,7 @@
 
 #include "../base/base.h"
 #include "../crypt/fnv1a.h"
+#include "../crypt/xorstr.h"
 
 namespace netvars {
 
@@ -13,7 +14,7 @@ uintptr_t get_offset(const char* className, uint32_t classKey, const char* membe
     std::add_lvalue_reference_t<type> var_name() {                        \
                                                                           \
         static const auto offset = netvars::get_offset(                   \
-            datatable, datatable##_hash, prop_name, prop_name##_hash);    \
+            XOR(datatable), datatable##_hash, XOR(prop_name), prop_name##_hash);    \
                                                                           \
         return *reinterpret_cast<std::add_pointer_t<type>>(               \
             (uintptr_t)(this) + offset + extra_offset);                   \

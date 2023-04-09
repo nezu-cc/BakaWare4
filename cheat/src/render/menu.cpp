@@ -14,7 +14,7 @@ void menu::render() noexcept {
 #ifdef _DEBUG
     ImGui::ShowDemoWindow();
 
-    if (ImGui::Button("Unhook"))
+    if (ImGui::Button(XOR("Unhook")))
         cheat::should_unhook = true;
 #endif
 
@@ -22,7 +22,7 @@ void menu::render() noexcept {
 
     ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
 	ImGui::SetNextWindowSize(ImVec2(800, 600));
-    if (ImGui::Begin(ADD_VERSION("BakaWare"), 0, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize)) {
+    if (ImGui::Begin(XOR(ADD_VERSION("BakaWare")), 0, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize)) {
         static int selected_tab = 0;
         {
             ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0, 0));
@@ -44,7 +44,7 @@ void menu::render() noexcept {
 			ImGui::PopStyleVar();
         }
         ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(8, 8));
-        if (ImGui::BeginChild("##settings", ImVec2(), true)) {
+        if (ImGui::BeginChild(XOR("##settings"), ImVec2(), true)) {
 			tabs[selected_tab]->render();
 		}
 		ImGui::EndChild();
@@ -99,18 +99,16 @@ bool menu::menu_tab::render_button(const ImVec2 size, bool selected, bool vertic
 	ImGui::RenderFrame(rect2.Min, rect2.Max, ImGui::GetColorU32(selected ? ImGuiCol_ButtonActive : ImGuiCol_Button), false, style.FrameRounding);
 	ImGui::RenderTextClipped(rect.Min + style.FramePadding, rect.Max - style.FramePadding, label.c_str(), NULL, &label_size, style.ButtonTextAlign, &rect);
 
-	//printf("%s: %d %.2f %.2f\n", label, b->mode, b->w, b->speed);
-
 	return pressed;
 }
 
 void menu::menu_tab_visuals::render() noexcept {
-    ImGui::Checkbox("Enabled", &cfg.esp.players.enabled);
-    ImGui::Checkbox("Box", &cfg.esp.players.box);
-    ImGui::Checkbox("Name", &cfg.esp.players.name);
-    ImGui::Checkbox("Health", &cfg.esp.players.health);
+    ImGui::Checkbox(XOR("Enabled"), &cfg.esp.players.enabled);
+    ImGui::Checkbox(XOR("Box"), &cfg.esp.players.box);
+    ImGui::Checkbox(XOR("Name"), &cfg.esp.players.name);
+    ImGui::Checkbox(XOR("Health"), &cfg.esp.players.health);
 }
 
 void menu::menu_tab_misc::render() noexcept {
-    ImGui::Text("Hello world! menu_tab_misc");
+    ImGui::Text(XOR("Hello world! menu_tab_misc"));
 }
