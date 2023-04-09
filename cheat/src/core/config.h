@@ -6,26 +6,18 @@ namespace config {
 
 class esp;
 
-class visuals {
+class player_visuals {
 public:
     bool enabled{ true };
+    bool health{ true };
     bool box{ true };
     bool name{ true };
-
-    NLOHMANN_DEFINE_TYPE_INTRUSIVE_WITH_DEFAULT(
-        visuals, enabled, box, name
-    )
-};
-
-class player_visuals: public visuals {
-public:
-    bool health{ true };
     // bool weapon{ true };
-    // bool skeleton{ true };
+    bool skeleton{ true };
     // bool ammo{ true };
 
     NLOHMANN_DEFINE_TYPE_INTRUSIVE_WITH_DEFAULT(
-        player_visuals, enabled, box, name, health
+        player_visuals, enabled, box, name, health, skeleton
     )
 };
 

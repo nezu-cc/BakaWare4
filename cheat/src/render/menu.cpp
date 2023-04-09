@@ -107,6 +107,7 @@ void menu::menu_tab_visuals::render() noexcept {
     ImGui::Checkbox(XOR("Box"), &cfg.esp.players.box);
     ImGui::Checkbox(XOR("Name"), &cfg.esp.players.name);
     ImGui::Checkbox(XOR("Health"), &cfg.esp.players.health);
+    ImGui::Checkbox(XOR("Skeleton"), &cfg.esp.players.skeleton);
 }
 
 void menu::menu_tab_misc::render() noexcept {

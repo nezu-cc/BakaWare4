@@ -21,9 +21,26 @@ public:
     uintptr_t m_Index;
 };
 
+struct alignas(16) bone_data {
+    vec3 pos;
+    float scale;
+    PAD(4 * sizeof(float)); // FIXME: add Quaternion
+    // quaternion Rotation;
+};
+
+static_assert(sizeof(bone_data) == 0x20);
+
+class skeleton_instance {
+public:
+    // NETVAR(m_modelState, "CSkeletonInstance", "m_modelState", model_state);
+    VIRTUAL_FUNCTION_SIG_ABSOLUTE(get_bone, void, dlls::client, "E8 ? ? ? ? EB 19 48 8B CF", 1, (this, data, index), bone_data& data, int index)
+};
+
 class game_scene_node {
 public:
     NETVAR(m_vecAbsOrigin, "CGameSceneNode", "m_vecAbsOrigin", vec3);
+
+    VIRTUAL_FUNCTION(get_skeleton_instance, skeleton_instance*, 8, (this))
 };
 
 class collision_property {

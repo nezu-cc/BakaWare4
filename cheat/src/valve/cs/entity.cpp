@@ -4,6 +4,7 @@
 #include "../../base/math.h"
 
 #include <limits>
+#include "../../core/input.h"
 
 cs::base_entity *cs::handle::get() noexcept {
     return interfaces::entity_list->get_base_entity(get_entry_index());

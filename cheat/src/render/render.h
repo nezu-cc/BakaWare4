@@ -50,6 +50,10 @@ public:
         draw_list->AddText(ImVec2(x, y), color.rgba, text);
     }
 
+    void line(float x1, float y1, float x2, float y2, clr4 color, float t = 1.0f) {
+        draw_list->AddLine(ImVec2(x1, y1), ImVec2(x2, y2), color.rgba, t);
+    }
+
 private:
     ImDrawList* draw_list;
 };
