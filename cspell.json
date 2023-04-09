@@ -5,7 +5,15 @@
     ],
     "dictionaryDefinitions": [],
     "dictionaries": [],
-    "words": [],
+    "words": [
+        "CONOUT",
+        "gameoverlayrenderer",
+        "Maxs",
+        "rendersystemdx",
+        "veorq",
+        "xored",
+        "XORSTR"
+    ],
     "ignoreWords": [],
     "import": []
 }

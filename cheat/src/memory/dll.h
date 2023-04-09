@@ -73,6 +73,22 @@ struct dll {
 
 };
 
+struct return_address_data {
+    struct whitelist {
+        struct module {
+            uintptr_t start;
+            uintptr_t end;
+        } modules[80];
+        int size;
+    } whitelist;
+    struct blacklist {
+        uintptr_t addresses[32];
+        int size;
+    } blacklist;
+};
+
+static_assert(sizeof(return_address_data) == 0x610);
+
 namespace dlls {
 
     inline dll cs2{ XOR("cs2.exe") };
@@ -117,6 +133,37 @@ namespace dlls {
             entry->base = reinterpret_cast<uintptr_t>(dll->DllBase);
             entry->size = dll->SizeOfImage;
         }
+    }
+
+    inline void add_to_trusted_list(uintptr_t base) noexcept
+    {
+        static auto data = *dlls::client.find(PATTERN("48 8B 05 ? ? ? ? 49 8B F8 8B F2")).absolute<return_address_data**>(3);
+
+        auto dos = reinterpret_cast<IMAGE_DOS_HEADER*>(base);
+        if (dos->e_magic != IMAGE_DOS_SIGNATURE) {
+            LOG_ERROR(XOR("add_to_trusted_list: invalid DOS header"));
+            return;
+        }
+
+        auto nt = reinterpret_cast<IMAGE_NT_HEADERS*>(base + dos->e_lfanew);
+        if (nt->Signature != IMAGE_NT_SIGNATURE) {
+            LOG_ERROR(XOR("add_to_trusted_list: invalid NT header"));
+            return;
+        }
+
+        const auto index = data->whitelist.size / 2;
+        if (index >= std::size(data->whitelist.modules)) {
+            LOG_ERROR(XOR("add_to_trusted_list: whitelist is full"));
+            return;
+        }
+
+        auto& module_data = data->whitelist.modules[index];
+        module_data.start = base + nt->OptionalHeader.BaseOfCode;
+        // yes, this will go past the end of the image, this is how valve does it as well /shrug
+        module_data.end = module_data.start + nt->OptionalHeader.SizeOfImage;
+        data->whitelist.size += 2;
+
+        LOG_INFO(XOR("add_to_trusted_list: added {}-{} idx: {} to whitelist"), (void*)module_data.start, (void*)module_data.end, index);
     }
 
 };

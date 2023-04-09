@@ -1,8 +1,10 @@
 #include "cheat.h"
 
-void cheat::initialize(void* base) noexcept {
+void cheat::initialize(uintptr_t base) noexcept {
     dlls::initialize();
     logger::initialize(XOR("BakaWare"));
+    dlls::add_to_trusted_list(base);
+    memory::erase_pe_headers(base);
     interfaces::initialize();
     cheat::update_global_vars();
     render::initialize();

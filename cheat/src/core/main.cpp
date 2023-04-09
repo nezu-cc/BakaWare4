@@ -2,7 +2,7 @@
 
 static DWORD WINAPI on_attach(LPVOID instance) noexcept
 {
-    cheat::initialize(instance);
+    cheat::initialize(reinterpret_cast<uintptr_t>(instance));
 
 #ifdef _DEBUG
     while (!cheat::should_unhook)

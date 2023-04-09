@@ -54,6 +54,46 @@ namespace memory {
         return length;
     }
 
+    inline void erase_pe_headers(uintptr_t base) noexcept
+    {
+    #ifndef _DEBUG
+        HMODULE mod;
+        if (GetModuleHandleExA(
+            GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS | GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT,
+            reinterpret_cast<LPCSTR>(base),
+            &mod
+        ) != 0) {
+            LOG_ERROR(XOR("erase_pe_header: module is not manually mapped, ignoring"));
+            return;
+        }
+
+        MEMORY_BASIC_INFORMATION info{ };
+        if (!VirtualQuery(reinterpret_cast<LPCVOID>(base), &info, sizeof(info))) {
+            LOG_ERROR(XOR("erase_pe_header: VirtualQuery failed"));
+            return;
+        }
+
+        if ((info.Protect & (PAGE_READWRITE | PAGE_EXECUTE_READWRITE)) == 0) {
+            LOG_ERROR(XOR("erase_pe_header: pe headers are not writable, ignoring"));
+            return;
+        }
+
+        auto dos = reinterpret_cast<IMAGE_DOS_HEADER*>(base);
+        if (dos->e_magic != IMAGE_DOS_SIGNATURE) {
+            LOG_ERROR(XOR("erase_pe_header: invalid DOS header"));
+            return;
+        }
+
+        auto nt = reinterpret_cast<IMAGE_NT_HEADERS*>(base + dos->e_lfanew);
+        if (nt->Signature != IMAGE_NT_SIGNATURE) {
+            LOG_ERROR(XOR("erase_pe_header: invalid NT header"));
+            return;
+        }
+
+        std::memset(reinterpret_cast<void*>(base), 0, nt->OptionalHeader.SizeOfHeaders);
+    #endif
+    }
+
 }
 
 #define VIRTUAL_FUNCTION(name, ret, idx, args, ... /* params */) \
