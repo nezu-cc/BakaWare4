@@ -124,8 +124,12 @@ void features::esp::render(render::renderer* r) noexcept {
         if (cfg.esp.players.health)
             render_health(r, bb, std::min(controller->m_iPawnHealth(), 100u));
 
-        if (cfg.esp.players.name)
-            render_name(r, bb, controller->m_sSanitizedPlayerName(), clr4::white(220)); // TODO: text color config
+        if (cfg.esp.players.name) {
+            std::string name(controller->m_sSanitizedPlayerName());
+            if (controller->m_steamID() == 0)
+                name.insert(0, "BOT ");
+            render_name(r, bb, name.c_str(), clr4::white(220)); // TODO: text color config
+        }
 
         if (cfg.esp.players.skeleton)
             render_skeleton(r, player, clr4::white(220)); // TODO: skeleton color config
