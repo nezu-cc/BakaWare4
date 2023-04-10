@@ -8,7 +8,8 @@ file(GLOB IMGUI "third_party/imgui/*.cpp" "third_party/imgui/backends/imgui_impl
 
 add_library(BakaWare4 SHARED ${SOURCES} ${IMGUI})
 
-set_property(TARGET BakaWare4 PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+# only use dynamic runtime in debug
+set_property(TARGET BakaWare4 PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:DebugDLL>")
 
 target_include_directories(BakaWare4 PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/third_party/imgui" "${CMAKE_CURRENT_SOURCE_DIR}/third_party/conf")
 target_link_libraries(BakaWare4 PRIVATE nlohmann_json::nlohmann_json)
