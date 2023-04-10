@@ -1,4 +1,5 @@
 #include "cheat.h"
+#include "../valve/cs/cs.h"
 
 LONG CALLBACK veh_handler(EXCEPTION_POINTERS* ExceptionInfo) {
 	auto exception_code = ExceptionInfo->ExceptionRecord->ExceptionCode;
@@ -51,4 +52,18 @@ void cheat::update_global_vars() noexcept {
         cheat::global_vars = *global_vars;
         LOG_INFO(XOR("Global vars updated: {}"), (void*)cheat::global_vars);
     }
+}
+
+void cheat::local_player::update() noexcept {
+    controller = cs::memory::get_local_player_controller();
+    if (!controller) {
+        pawn = nullptr;
+        return;
+    }
+    pawn = controller->m_hPawn().get_as<cs::player_pawn>();
+}
+
+void cheat::local_player::reset() noexcept {
+    controller = nullptr;
+    pawn = nullptr;
 }

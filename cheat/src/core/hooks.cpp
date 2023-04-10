@@ -23,8 +23,10 @@ void hooks::initialize() noexcept
     SET_PTR_HOOK(resize_buffers_ptr, resize_buffers);
 
     SET_VT_HOOK(interfaces::csgo_input, mouse_input_enabled, 10);
+    SET_VT_HOOK(interfaces::csgo_input, create_move, 5);
     SET_VT_HOOK(interfaces::input_system, relative_mouse_mode, 76);
     SET_VT_HOOK(interfaces::client_mode, level_init, 23);
+    SET_VT_HOOK(interfaces::client_mode, level_shutdown, 24);
 
     LOG_INFO(XOR("Hooks initialized."));
 }

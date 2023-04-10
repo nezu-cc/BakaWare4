@@ -16,6 +16,10 @@ void menu::render() noexcept {
 
     if (ImGui::Button(XOR("Unhook")))
         cheat::should_unhook = true;
+    
+    ImGui::Text(XOR("Global vars: %p"), cheat::global_vars);
+    ImGui::Text(XOR("Local controller: %p"), cheat::local.controller);
+    ImGui::Text(XOR("Local player pawn: %p"), cheat::local.pawn);
 #endif
 
 

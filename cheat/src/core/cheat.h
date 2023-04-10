@@ -7,7 +7,18 @@
 
 namespace cheat {
 
-    // inline cs::local_player local{ };
+    struct local_player {
+        cs::player_controller* controller;
+        cs::player_pawn* pawn;
+
+        auto operator->() noexcept { return pawn; }
+        operator bool() noexcept { return pawn; }
+
+        void update() noexcept;
+        void reset() noexcept;
+    };
+
+    inline local_player local{ };
     inline bool should_unhook{ };
     inline d2 screen_size{ };
     inline se::global_vars* global_vars{ };
