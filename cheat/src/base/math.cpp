@@ -4,7 +4,8 @@
 #include "../core/cheat.h"
 
 bool math::world_to_screen(const vec3 &world, vec2 &screen) noexcept {
-    static bool(__thiscall* function)(const vec3&, vec3&) = dlls::client.find(PATTERN("E8 ? ? ? ? F3 0F 10 45 ? 8B D0")).absolute<decltype(function)>();
+    SIG(function_ptr, dlls::client, "E8 ? ? ? ? F3 0F 10 45 ? 8B D0")
+    auto function = function_ptr.absolute<bool(__thiscall*)(const vec3&, vec3&)>();
     vec3 screen_ret;
     if (function(world, screen_ret))
         return false;

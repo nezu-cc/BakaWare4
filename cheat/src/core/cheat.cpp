@@ -47,7 +47,8 @@ DWORD cheat::end(LPVOID instance) noexcept {
 }
 
 void cheat::update_global_vars() noexcept {
-    static auto global_vars = dlls::client.find(PATTERN("48 89 15 ? ? ? ? 48 8D 05 ? ? ? ? 48 85")).absolute<se::global_vars**>(0x3);
+    SIG(globals_ptr, dlls::client, "48 89 15 ? ? ? ? 48 8D 05 ? ? ? ? 48 85")
+    auto global_vars = globals_ptr.absolute<se::global_vars**>(0x3);
     if (cheat::global_vars != *global_vars) {
         cheat::global_vars = *global_vars;
         LOG_INFO(XOR("Global vars updated: {}"), (void*)cheat::global_vars);
@@ -55,7 +56,7 @@ void cheat::update_global_vars() noexcept {
 }
 
 void cheat::local_player::update() noexcept {
-    controller = cs::memory::get_local_player_controller();
+    controller = cs::get_local_player_controller();
     if (!controller) {
         pawn = nullptr;
         return;

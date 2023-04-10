@@ -96,13 +96,10 @@ class player_pawn : public base_player_pawn {
     // bool IsEnemyToLocalPlayer(int lpTeam);
 };
 
-namespace memory {
-    inline cs::player_controller* get_local_player_controller(int32_t split_screen_slot = 0) noexcept {
-        using function_t = player_controller*(__stdcall*)(int32_t);
-        static function_t fn = dlls::client.find(PATTERN("E8 ? ? ? ? 49 89 47 08")).absolute<function_t>();
-        ASSERT(fn);
-        return fn(split_screen_slot);
-    }
+inline cs::player_controller* get_local_player_controller(int32_t split_screen_slot = 0) noexcept {
+    SIG(sig, dlls::client, "E8 ? ? ? ? 49 89 47 08")
+    auto fn = sig.absolute<player_controller*(__stdcall*)(int32_t)>();
+    return fn(split_screen_slot);
 }
 
 }

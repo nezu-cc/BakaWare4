@@ -3,6 +3,7 @@
 
 namespace menu {
     inline bool is_open{ true };
+    inline int selected_tab { 0 };
 
     inline void toggle() { is_open = !is_open; };
     void render() noexcept;

@@ -27,7 +27,6 @@ void menu::render() noexcept {
     ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
 	ImGui::SetNextWindowSize(ImVec2(800, 600));
     if (ImGui::Begin(XOR(ADD_VERSION("BakaWare")), 0, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize)) {
-        static int selected_tab = 0;
         {
             ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0, 0));
             ImGui::Columns(2, 0, true);

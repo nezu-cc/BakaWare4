@@ -10,6 +10,38 @@
 #include "dll.h"
 #include "netvars.h"
 
+template<size_t len> requires(len > 0)
+class signature {
+private:
+    std::mutex mtx { };
+    bool found { };
+    address addr { };
+    dll &mod;
+    std::array<int, len> pattern { };
+
+    inline void find() noexcept {
+        std::scoped_lock lock(mtx);
+        if (found)
+            return;
+
+        addr = mod.find(std::move(pattern));
+        found = true;
+    }
+
+public:
+    signature(dll &mod, std::array<int, len> pattern) noexcept : mod(mod), pattern(pattern) { }
+
+    inline address get() noexcept {
+        if (!found)
+            find();
+        return addr;
+    }
+};
+
+#define SIG(name, dll, sig) \
+    static signature CONCAT(name, _static)(dll, PATTERN(sig)); \
+    auto name = CONCAT(name, _static).get();
+
 namespace memory {
 
     template<class ty, int i, class... va_args>
@@ -106,14 +138,16 @@ inline ret name(__VA_ARGS__) noexcept \
 #define VIRTUAL_FUNCTION_SIG(name, ret, dll, sig, args, ... /* params */) \
 inline ret name(__VA_ARGS__) noexcept \
 { \
-    static ret(__thiscall* fn)(void*, __VA_ARGS__) = dll.find(PATTERN(sig)).cast<decltype(fn)>(); \
+    SIG(addr, dll, sig) \
+    auto fn = addr.cast<ret(__thiscall*)(void*, __VA_ARGS__)>(); \
     return fn args; \
 }
 
 #define VIRTUAL_FUNCTION_SIG_ABSOLUTE(name, ret, dll, sig, offset, args, ... /* params */) \
 inline ret name(__VA_ARGS__) noexcept \
 { \
-    static ret(__thiscall* fn)(void*, __VA_ARGS__) = dll.find(PATTERN(sig)).absolute<decltype(fn)>(offset); \
+    SIG(addr, dll, sig) \
+    auto fn = addr.absolute<ret(__thiscall*)(void*, __VA_ARGS__)>(offset); \
     return fn args; \
 }
 
