@@ -49,7 +49,7 @@ void render_name(render::renderer* r, const bbox& bb, const char* name, const cl
     );
 }
 
-void render_skeleton(render::renderer* r, cs::base_entity* controller, const clr4& clr) {
+bool render_skeleton(render::renderer* r, cs::base_entity* controller, const clr4& clr, bool render, bbox& bb, float padding = 0.f) {
     constexpr std::array<std::tuple<uint8_t, uint8_t>, 15> tr = {{
         { 84, 26 },{ 26, 25 },{ 25, 0  },	// right leg
         { 82, 23 },{ 23, 22 },{ 22, 0  },	// left leg
@@ -67,16 +67,26 @@ void render_skeleton(render::renderer* r, cs::base_entity* controller, const clr
     }};
 
     auto game_scene_node = controller->m_pGameSceneNode();
-    if(!game_scene_node)
-        return;
+    if (!game_scene_node)
+        return false;
 
     auto skeleton = game_scene_node->get_skeleton_instance();
-    if(!skeleton)
-        return;
+    if (!skeleton)
+        return false;
 
+    // do this first so we don't have to check every bone if the origin is offscreen
+    auto& origin = game_scene_node->m_vecAbsOrigin();
+    auto origin2 = origin + vec3(0, 0, 32);
+    vec2 origin_scr, origin2_scr;
+    if (!math::world_to_screen(origin, origin_scr) || !math::world_to_screen(origin2, origin2_scr))
+        return false;
+    
     // FIXME: bone count check
 
     auto bones = controller->m_iTeamNum() == 2 ? tr : ct;
+
+    size_t visible_bones = 0;
+    std::array<vec2, std::tuple_size<decltype(bones)>::value * 2> bone_scrs;
 
     for (auto& bone : bones) {
         cs::bone_data bone1, bone2;
@@ -87,12 +97,41 @@ void render_skeleton(render::renderer* r, cs::base_entity* controller, const clr
         if (!math::world_to_screen(bone1.pos, bone1_scr) || !math::world_to_screen(bone2.pos, bone2_scr))
             continue;
 
+        bone_scrs[visible_bones++] = bone1_scr;
+        bone_scrs[visible_bones++] = bone2_scr;
+
         r->line(
             bone1_scr.x, bone1_scr.y,
             bone2_scr.x, bone2_scr.y,
             clr, 2
         );
     }
+
+    bb.x = bb.y = std::numeric_limits<float>::max();
+    bb.w = bb.h = -std::numeric_limits<float>::max();
+
+    if (visible_bones == 0)
+        return false;
+
+    for (size_t i = 0; i < visible_bones; i++) {
+        bb.x = std::min(bb.x, bone_scrs[i].x);
+        bb.y = std::min(bb.y, bone_scrs[i].y);
+        bb.w = std::max(bb.w, bone_scrs[i].x);
+        bb.h = std::max(bb.h, bone_scrs[i].y);
+    }
+
+    bb.x = std::floor(bb.x);
+    bb.y = std::floor(bb.y);
+    bb.w = std::floor(bb.w);
+    bb.h = std::floor(bb.h);
+
+    const float scale = std::abs(origin_scr.y - origin2_scr.y) / 32.f;
+    bb.x -= std::floor(scale * padding);
+    bb.y -= std::floor(scale * padding);
+    bb.w += std::floor(scale * padding);
+    bb.h += std::floor(scale * padding);
+
+    return true;
 }
 
 void features::esp::render(render::renderer* r) noexcept {
@@ -113,7 +152,7 @@ void features::esp::render(render::renderer* r) noexcept {
             continue;
 
         bbox bb;
-        if (!player->get_bounding_box(bb))
+        if (!render_skeleton(r, player, clr4::white(220), cfg.esp.players.skeleton, bb, 8)) // TODO: skeleton color config
             continue;
 
         if (cfg.esp.players.box)
@@ -128,8 +167,5 @@ void features::esp::render(render::renderer* r) noexcept {
                 name.insert(0, "BOT ");
             render_name(r, bb, name.c_str(), clr4::white(220)); // TODO: text color config
         }
-
-        if (cfg.esp.players.skeleton)
-            render_skeleton(r, player, clr4::white(220)); // TODO: skeleton color config
     }
 }
