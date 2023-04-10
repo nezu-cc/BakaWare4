@@ -12,6 +12,7 @@ struct dll;
 namespace dlls { inline std::vector<dll*> list; }
 
 struct dll {
+    mutable std::mutex mutex{ };
     std::string name{ };
     uintptr_t base{ };
     size_t size{ };
@@ -26,6 +27,8 @@ struct dll {
     template<size_t len> requires(len > 0)
     address find(std::array<int, len>&& pattern) const noexcept
     {
+        std::lock_guard<std::mutex> guard(mutex);
+
         auto bytes = reinterpret_cast<uint8_t*>(base);
         for (size_t i{ }; i < size - len; i++) {
             for (size_t j{ }; j < len; j++) {
