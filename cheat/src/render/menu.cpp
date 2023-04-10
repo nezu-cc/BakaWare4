@@ -114,5 +114,5 @@ void menu::menu_tab_visuals::render() noexcept {
 }
 
 void menu::menu_tab_misc::render() noexcept {
-    ImGui::Text(XOR("Hello world! menu_tab_misc"));
+    ImGui::Checkbox(XOR("Bunny hop"), &cfg.misc.bunny_hop);
 }

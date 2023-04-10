@@ -1,6 +1,4 @@
 #include "features.h"
-#include "../../base/math.h"
-#include "../../core/cheat.h"
 
 void render_box(render::renderer* r, const bbox& bb, const clr4& clr) {
     r->rect(
@@ -102,7 +100,7 @@ void features::esp::render(render::renderer* r) noexcept {
     if (cfg.esp.players.enabled == false)
         return;
 
-    if (!interfaces::engine->is_in_game() || !interfaces::engine->is_connected())
+    if (!interfaces::engine->is_valid())
         return;
 
     for (uint32_t i = 1; i < cheat::global_vars->max_clients; i++) {
@@ -126,7 +124,7 @@ void features::esp::render(render::renderer* r) noexcept {
 
         if (cfg.esp.players.name) {
             std::string name(controller->m_sSanitizedPlayerName());
-            if (controller->m_steamID() == 0)
+            if (controller->has_flag(cs::flags::fl_fakeclient))
                 name.insert(0, "BOT ");
             render_name(r, bb, name.c_str(), clr4::white(220)); // TODO: text color config
         }

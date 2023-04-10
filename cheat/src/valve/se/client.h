@@ -3,7 +3,20 @@
 #include "../../memory/memory.h"
 #include "../cs/entity.h"
 
+#define MAX_SPLITSCREEN_PLAYERS 1
+
 namespace se {
+
+enum buttons : uint32_t {
+    in_attack = 1,
+    in_jump = 2,
+    in_duck = 4,
+    in_attack2 = 2048,
+    in_moveforward = 8,
+    in_moveback = 16,
+    in_moveleft = 512,
+    in_moveright = 1024
+};
 
 struct entity_list;
 
@@ -21,10 +34,56 @@ struct entity_list {
     template <class ty = cs::base_entity *>
     VIRTUAL_FUNCTION_SIG_ABSOLUTE(get_base_entity, ty, dlls::client, "8B D3 E8 ? ? ? ? 48 8B F8 48 85 C0 74 76", 3, (this, index), int index)
     VIRTUAL_FUNCTION_SIG_ABSOLUTE(get_max_entities, int, dlls::client, "33 DB E8 ? ? ? ? 8B 08", 3, (this, max), int* max)
+    
 };
 
+struct cmd_qangle {
+    char pad1[0x18];
+    vec3 angles;
+};
+
+static_assert(sizeof(cmd_qangle) == 0x24);
+
+struct user_cmd_base {
+    PAD(0x40)
+    cmd_qangle* view;
+    PAD(0x8)
+    float forwardmove;
+    float sidemove;
+
+    // TODO: maybe more here
+};
+
+struct user_cmd {
+    PAD(0x30)
+    user_cmd_base* base;
+    PAD(0x18)
+    uint32_t buttons;
+    PAD(0x1C)
+};
+
+static_assert(sizeof(user_cmd) == 0x70);
+
+struct per_user_input {
+    user_cmd cmds[150];
+    PAD(0x30)
+    int sequence_number;
+    PAD(0x18C)
+};
+
+static_assert(sizeof(per_user_input) == sizeof(user_cmd) * (150 + 4)); // 0x4360
+
 struct csgo_input {
-    
+    PAD(0x10);
+    per_user_input per_user[MAX_SPLITSCREEN_PLAYERS];
+
+    user_cmd* get_user_cmd(int split_screen_index) {
+        if (split_screen_index >= MAX_SPLITSCREEN_PLAYERS) {
+            return nullptr;
+        }
+        auto input = &per_user[split_screen_index];
+        return &input->cmds[input->sequence_number % std::size(input->cmds)];
+    }
 };
 
 struct client_mode {

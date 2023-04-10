@@ -10,6 +10,9 @@ struct engine_client {
     VIRTUAL_FUNCTION(get_level_name, const char*, 51, (this));
     VIRTUAL_FUNCTION(get_level_name_short, const char*, 52, (this));
 
+    inline bool is_valid() noexcept {
+        return is_in_game() && is_connected();
+    }
 };
 
 }

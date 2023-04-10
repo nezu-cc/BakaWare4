@@ -16,6 +16,18 @@ namespace cheat {
 
         void update() noexcept;
         void reset() noexcept;
+
+        inline bool valid() noexcept { 
+            return pawn && pawn->m_lifeState() == cs::life_state::LIFE_ALIVE;
+        }
+
+        inline bool void_move_type() noexcept {
+            if (!pawn)
+                return false;
+            const auto move_type = pawn->m_MoveType();
+            return move_type != cs::move_type::MOVETYPE_NOCLIP
+                && move_type != cs::move_type::MOVETYPE_LADDER;
+        }
     };
 
     inline local_player local{ };

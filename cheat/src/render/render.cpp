@@ -144,7 +144,7 @@ void render::render() noexcept {
 
     auto r = render::renderer(ImGui::GetBackgroundDrawList());
 
-    features::esp::render(&r);
+    features::render(&r);
 
     menu::render();
 
