@@ -100,11 +100,13 @@ bool render_skeleton(render::renderer* r, cs::base_entity* controller, const clr
         bone_scrs[visible_bones++] = bone1_scr;
         bone_scrs[visible_bones++] = bone2_scr;
 
-        r->line(
-            bone1_scr.x, bone1_scr.y,
-            bone2_scr.x, bone2_scr.y,
-            clr, 2
-        );
+        if (render) {
+            r->line(
+                bone1_scr.x, bone1_scr.y,
+                bone2_scr.x, bone2_scr.y,
+                clr, 1
+            );
+        }
     }
 
     bb.x = bb.y = std::numeric_limits<float>::max();
