@@ -107,6 +107,7 @@ bool menu::menu_tab::render_button(const ImVec2 size, bool selected, bool vertic
 
 void menu::menu_tab_visuals::render() noexcept {
     ImGui::Checkbox(XOR("Enabled"), &cfg.esp.players.enabled);
+    ImGui::Checkbox(XOR("Teammates"), &cfg.esp.players.teammates);
     ImGui::Checkbox(XOR("Box"), &cfg.esp.players.box);
     ImGui::Checkbox(XOR("Name"), &cfg.esp.players.name);
     ImGui::Checkbox(XOR("Health"), &cfg.esp.players.health);

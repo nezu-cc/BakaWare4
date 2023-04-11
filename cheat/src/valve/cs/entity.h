@@ -163,7 +163,8 @@ public:
 };
 
 class player_pawn : public player_pawn_base {
-    // bool IsEnemyToLocalPlayer(int lpTeam);
+public:
+    VIRTUAL_FUNCTION_SIG(is_enemy, bool, dlls::client, "40 57 48 83 EC 40 48 8B F9 48 85", (this, other_player), player_pawn* other_player)
 };
 
 inline cs::player_controller* get_local_player_controller(int32_t split_screen_slot = 0) noexcept {

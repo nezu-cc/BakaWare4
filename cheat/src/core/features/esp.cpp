@@ -51,19 +51,19 @@ void render_name(render::renderer* r, const bbox& bb, const char* name, const cl
 
 bool render_skeleton(render::renderer* r, cs::base_entity* controller, const clr4& clr, bool render, bbox& bb, float padding = 0.f) {
     constexpr std::array<std::tuple<uint8_t, uint8_t>, 15> tr = {{
-        { 84, 26 },{ 26, 25 },{ 25, 0  },	// right leg
-        { 82, 23 },{ 23, 22 },{ 22, 0  },	// left leg
-        { 5,  92 },{ 92, 11 },{ 11, 12 },	// left arm
-        { 5,  96 },{ 96, 16 },{ 16, 17 },	// right arm
-        { 0,  21 },{ 21, 5 }, { 5, 6   }	// spine
+        { 84, 26 },{ 26, 25 },{ 25, 0  }, // right leg
+        { 82, 23 },{ 23, 22 },{ 22, 0  }, // left leg
+        { 5,  92 },{ 92, 11 },{ 11, 12 }, // left arm
+        { 5,  96 },{ 96, 16 },{ 16, 17 }, // right arm
+        { 0,  21 },{ 21, 5  },{ 5,  6  }  // spine
     }};
 
     constexpr std::array<std::tuple<uint8_t, uint8_t>, 15> ct = {{
-        { 97, 27 },{ 27,  26 },{ 26, 0  },	// right leg
-        { 95, 24 },{ 24,  23 },{ 23, 0  },	// left leg
-        { 5, 55  },{ 55,  11 },{ 11, 12 },	// left arm
-        { 5, 105 },{ 105, 16 },{ 16, 17 },	// right arm
-        { 0, 21  },{ 21,  5  },{ 5,  6  }	// spine
+        { 97, 27 },{ 27,  26 },{ 26, 0  }, // right leg
+        { 95, 24 },{ 24,  23 },{ 23, 0  }, // left leg
+        { 5, 55  },{ 55,  11 },{ 11, 12 }, // left arm
+        { 5, 105 },{ 105, 16 },{ 16, 17 }, // right arm
+        { 0, 21  },{ 21,  5  },{ 5,  6  }  // spine
     }};
 
     auto game_scene_node = controller->m_pGameSceneNode();
@@ -149,6 +149,9 @@ void features::esp::render(render::renderer* r) noexcept {
         
         auto player = controller->m_hPawn().get_as<cs::player_pawn>();
         if (!player)
+            continue;
+        
+        if (cheat::local && !cheat::local->is_enemy(player) && !cfg.esp.players.teammates)
             continue;
 
         bbox bb;

@@ -13,6 +13,8 @@ namespace cheat {
 
         auto operator->() noexcept { return pawn; }
         operator bool() noexcept { return pawn; }
+        operator cs::player_pawn*() noexcept { return pawn; }
+
 
         void update() noexcept;
         void reset() noexcept;

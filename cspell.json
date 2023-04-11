@@ -33,6 +33,7 @@
         "rendersystemdx",
         "RESPAWNABLE",
         "RESPAWNING",
+        "scrs",
         "sidemove",
         "staticprop",
         "stepmovement",

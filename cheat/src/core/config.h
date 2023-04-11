@@ -9,6 +9,7 @@ class esp;
 class player_visuals {
 public:
     bool enabled{ true };
+    bool teammates{ false };
     bool health{ true };
     bool box{ true };
     bool name{ true };
