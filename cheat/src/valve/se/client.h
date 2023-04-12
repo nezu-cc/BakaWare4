@@ -74,8 +74,7 @@ struct per_user_input {
 static_assert(sizeof(per_user_input) == sizeof(user_cmd) * (150 + 4)); // 0x4360
 
 struct csgo_input {
-    PAD(0x10);
-    per_user_input per_user[MAX_SPLITSCREEN_PLAYERS];
+    VIRTUAL_FUNCTION_SIG(set_cursor_pos, void, dlls::client, "44 89 44 24 18 89 54 24 10 48 83", (this, x, y), uint32_t x, uint32_t y)
 
     user_cmd* get_user_cmd(int split_screen_index) {
         if (split_screen_index >= MAX_SPLITSCREEN_PLAYERS) {
@@ -84,6 +83,9 @@ struct csgo_input {
         auto input = &per_user[split_screen_index];
         return &input->cmds[input->sequence_number % std::size(input->cmds)];
     }
+private:
+    PAD(0x10);
+    per_user_input per_user[MAX_SPLITSCREEN_PLAYERS];
 };
 
 struct client_mode {

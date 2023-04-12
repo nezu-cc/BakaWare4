@@ -1,7 +1,47 @@
-#include <windowsx.h>
-
 #include "input.h"
 #include "../memory/interfaces.h"
+#include "cheat.h"
+#include <windowsx.h>
+
+void input::initialize(bool unlock) noexcept
+{
+    input_context = interfaces::input_stack_system->find_input_context(XOR("Mouse Control"));
+    if (!input_context) {
+        LOG_ERROR(XOR("Failed to find \"Mouse Control\" input context."));
+        return;
+    }
+
+    last_mouse_enabled = input_context->enabled;
+    LOG_INFO(XOR("Input initialized. last_mouse_enabled = {}"), last_mouse_enabled);
+
+    if (unlock)
+        unlock_cursor(true);
+}
+
+void input::unlock_cursor(bool unlock) noexcept
+{
+    if (!input_context) {
+        LOG_ERROR(XOR("Failed to {} cursor, missing input context."), (unlock ? XOR("unlock") : XOR("lock")));
+        cursor_unlocked = unlock;
+        return;
+    }
+
+    // we already are in the desired state
+    if (unlock == cursor_unlocked)
+        return;
+
+    if (cursor_unlocked = unlock) {
+        // save game state
+        last_mouse_enabled = input_context->enabled;
+        if (!last_mouse_enabled) {
+            interfaces::input_stack_system->set_mouse_capture(input_context, true);
+            interfaces::csgo_input->set_cursor_pos(cheat::screen_size.x / 2, cheat::screen_size.y / 2);
+        }
+    } else {
+        // restore game state when unlocking
+        interfaces::input_stack_system->set_mouse_capture(input_context, last_mouse_enabled);
+    }
+}
 
 bool input::is_key_active(keybind key) noexcept
 {

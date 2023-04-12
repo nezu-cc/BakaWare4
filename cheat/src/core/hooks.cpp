@@ -6,8 +6,6 @@
 
 void hooks::initialize() noexcept
 {
-    last_mouse_relative_mode = interfaces::input_system->is_relative_mouse_mode();
-
     if (render::game_window)
         original_wnd_proc = reinterpret_cast<WNDPROC>(SetWindowLongPtr(render::game_window, GWLP_WNDPROC, reinterpret_cast<LONG_PTR>(wnd_proc)));
     else
@@ -24,7 +22,6 @@ void hooks::initialize() noexcept
 
     SET_VT_HOOK(interfaces::csgo_input, mouse_input_enabled, 10);
     SET_VT_HOOK(interfaces::csgo_input, create_move, 5);
-    SET_VT_HOOK(interfaces::input_system, relative_mouse_mode, 76);
     SET_VT_HOOK(interfaces::client_mode, level_init, 23);
     SET_VT_HOOK(interfaces::client_mode, level_shutdown, 24);
 
@@ -43,6 +40,4 @@ void hooks::end() noexcept {
 
     if (original_wnd_proc && render::game_window)
         SetWindowLongPtr(render::game_window, GWLP_WNDPROC, reinterpret_cast<LONG_PTR>(original_wnd_proc));
-    
-    relative_mouse_mode::original(interfaces::input_system, last_mouse_relative_mode);
 }

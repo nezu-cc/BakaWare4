@@ -1,11 +1,15 @@
 #pragma once
 #include "../base/base.h"
+#include "../core/input.h"
 
 namespace menu {
     inline bool is_open{ true };
     inline int selected_tab { 0 };
 
-    inline void toggle() { is_open = !is_open; };
+    inline void toggle() { 
+        is_open = !is_open;
+        input::unlock_cursor(is_open);
+    };
     void render() noexcept;
 
     class menu_tab {

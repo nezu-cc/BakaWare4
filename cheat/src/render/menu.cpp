@@ -1,6 +1,5 @@
 #include "menu.h"
 #include "../core/cheat.h"
-#include "../valve/sdl/sdl.h"
 #include <imgui.h>
 #include <imgui_internal.h>
 #include "../core/config.h"
@@ -20,9 +19,8 @@ void menu::render() noexcept {
     ImGui::Text(XOR("Global vars: %p"), cheat::global_vars);
     ImGui::Text(XOR("Local controller: %p"), cheat::local.controller);
     ImGui::Text(XOR("Local player pawn: %p"), cheat::local.pawn);
+    ImGui::Text(XOR("last_mouse_enabled: %d"), input::last_mouse_enabled ? 1 : 0);
 #endif
-
-
 
     ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
 	ImGui::SetNextWindowSize(ImVec2(800, 600));

@@ -2,10 +2,8 @@
 #include "dll.h"
 
 static void collect_interfaces(dll& dll) noexcept;
-template<bool replace_vmt = false, class ty>
+template<class ty>
 static void get_cached_interface(interface_holder<ty*>& ptr, std::string_view version_string) noexcept;
-template<bool replace_vmt = false, class ty>
-static void find_interface(interface_holder<ty*>& ptr, dll& dll, std::string_view version_string) noexcept;
 
 void interfaces::initialize() noexcept
 {
@@ -18,7 +16,7 @@ void interfaces::initialize() noexcept
     get_cached_interface(engine, XOR("Source2EngineToClient001"));
     get_cached_interface(game_resource, XOR("GameResourceServiceClientV001"));
     get_cached_interface(schema_system, XOR("SchemaSystem_001"));
-    get_cached_interface<true>(input_system, XOR("InputSystemVersion001"));
+    get_cached_interface(input_stack_system, XOR("InputStackSystemVersion001"));
 
     entity_list.initialize(game_resource->get_entity_list());
     csgo_input.initialize<true>(*dlls::client.find(PATTERN("48 8B 0D ? ? ? ? 48 8B 01 FF 50 ? 8B DF")).absolute<se::csgo_input**>(3));
@@ -58,27 +56,12 @@ static void collect_interfaces(dll& dll) noexcept
     }
 }
 
-// Version strings may be partial.
-
-template<bool replace_vmt, class ty>
-static void find_interface(interface_holder<ty*>& ptr, dll& dll, std::string_view version_string) noexcept
-{
-    for (auto cur = get_interface_regs(dll); cur; cur = cur->next) {
-        if (std::string(cur->name).starts_with(version_string)) {
-            LOG_INFO(XOR("Found interface: {}"), cur->name);
-            ptr.template initialize<replace_vmt>(static_cast<ty*>(cur->create_fn()));
-            return;
-        }
-    }
-    ASSERT(false);
-}
-
-template<bool replace_vmt, class ty>
+template<class ty>
 static void get_cached_interface(interface_holder<ty*>& ptr, std::string_view version_string) noexcept
 {
     for (const auto& [name, iface] : interfaces::list) {
         if (name.starts_with(version_string.data())) {
-            ptr.template initialize<replace_vmt>(static_cast<ty*>(iface));
+            ptr.template initialize<false>(static_cast<ty*>(iface));
             return;
         }
     }

@@ -1,10 +1,10 @@
 #include "../hooks.h"
-#include "../../render/menu.h"
+#include "../../core/input.h"
 #include "../../core/cheat.h"
 #include "../../core/features/features.h"
 
 bool __fastcall hooks::mouse_input_enabled::fn(se::csgo_input* rcx) {
-    if (menu::is_open)
+    if (input::cursor_unlocked)
         return false;
 
     return original(rcx);

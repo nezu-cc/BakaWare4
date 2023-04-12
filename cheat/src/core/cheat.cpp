@@ -1,4 +1,5 @@
 #include "cheat.h"
+#include "../render/menu.h"
 #include "../valve/cs/cs.h"
 
 LONG CALLBACK veh_handler(EXCEPTION_POINTERS* ExceptionInfo) {
@@ -26,6 +27,7 @@ void cheat::initialize(uintptr_t base) noexcept {
     interfaces::initialize();
     cheat::update_global_vars();
     render::initialize();
+    input::initialize(menu::is_open);
     hooks::initialize();
     // cfg::initialize();
 
@@ -39,6 +41,7 @@ void cheat::initialize(uintptr_t base) noexcept {
 }
 
 DWORD cheat::end(LPVOID instance) noexcept {
+    input::unlock_cursor(false);
     hooks::end();
     logger::end();
 

@@ -3,6 +3,7 @@
 #include "../memory/interfaces.h"
 #include "../memory/hook_mgr.h"
 #include "../render/render.h"
+#include "input.h"
 #include "config.h"
 
 namespace cheat {
