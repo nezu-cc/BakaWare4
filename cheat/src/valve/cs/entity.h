@@ -66,6 +66,31 @@ enum flags : uint32_t {
     fl_unblockable_by_player = (1 << 30)
 };
 
+enum bone_flags : uint32_t {
+	FLAG_NO_BONE_FLAGS = 0x0,
+	FLAG_BONEFLEXDRIVER = 0x4,
+	FLAG_CLOTH = 0x8,
+	FLAG_PHYSICS = 0x10,
+	FLAG_ATTACHMENT = 0x20,
+	FLAG_ANIMATION = 0x40,
+	FLAG_MESH = 0x80,
+	FLAG_HITBOX = 0x100,
+	FLAG_BONE_USED_BY_VERTEX_LOD0 = 0x400,
+	FLAG_BONE_USED_BY_VERTEX_LOD1 = 0x800,
+	FLAG_BONE_USED_BY_VERTEX_LOD2 = 0x1000,
+	FLAG_BONE_USED_BY_VERTEX_LOD3 = 0x2000,
+	FLAG_BONE_USED_BY_VERTEX_LOD4 = 0x4000,
+	FLAG_BONE_USED_BY_VERTEX_LOD5 = 0x8000,
+	FLAG_BONE_USED_BY_VERTEX_LOD6 = 0x10000,
+	FLAG_BONE_USED_BY_VERTEX_LOD7 = 0x20000,
+	FLAG_BONE_MERGE_READ = 0x40000,
+	FLAG_BONE_MERGE_WRITE = 0x80000,
+	FLAG_ALL_BONE_FLAGS = 0xfffff,
+	BLEND_PREALIGNED = 0x100000,
+	FLAG_RIGIDLENGTH = 0x200000,
+	FLAG_PROCEDURAL = 0x400000,
+};
+
 class base_entity;
 
 class handle {
@@ -84,16 +109,34 @@ public:
 struct alignas(16) bone_data {
     vec3 pos;
     float scale;
-    PAD(4 * sizeof(float)); // FIXME: add Quaternion
-    // quaternion Rotation;
+    vec4 rot;
 };
 
 static_assert(sizeof(bone_data) == 0x20);
 
+class model {
+public:
+    VIRTUAL_FUNCTION_SIG_ABSOLUTE(num_bones, uint32_t, dlls::client, "E8 ? ? ? ? 85 C0 7E 21", 1, (this))
+    VIRTUAL_FUNCTION_SIG(bone_flags, uint32_t, dlls::client, "85 D2 78 16 3B 91", (this, index), uint32_t index)
+    VIRTUAL_FUNCTION_SIG(bone_name, const char*, dlls::client, "85 D2 78 25 3B 91", (this, index), uint32_t index)
+    VIRTUAL_FUNCTION_SIG(bone_parent, int32_t, dlls::client, "85 D2 78 17 3B 91 70", (this, index), uint32_t index)
+};
+
+class model_state {
+public:
+    NETVAR(m_hModel, "CModelState", "m_hModel", se::strong_handle<model>);
+
+    bone_data* get_bone_data() noexcept {
+        return address(this).offset(0x80).dereference<bone_data*>();
+    }
+};
+
 class skeleton_instance {
 public:
-    // NETVAR(m_modelState, "CSkeletonInstance", "m_modelState", model_state);
+    NETVAR(m_modelState, "CSkeletonInstance", "m_modelState", model_state);
+
     VIRTUAL_FUNCTION_SIG_ABSOLUTE(get_bone, void, dlls::client, "E8 ? ? ? ? EB 19 48 8B CF", 1, (this, data, index), bone_data& data, int index)
+    VIRTUAL_FUNCTION_SIG(calc_world_space_bones, void, dlls::client, "40 55 56 57 41 54 41 55 41 56 41 57 48 81 EC F0", (this, bone_mask), bone_flags bone_mask)
 };
 
 class game_scene_node {
@@ -159,7 +202,7 @@ public:
 
 class player_pawn_base : public base_player_pawn {
 public:
-    NETVAR(m_iHealth, "C_CSPlayerPawnBase", "m_aimPunchCache", util_vector<angle>);
+    NETVAR(m_iHealth, "C_CSPlayerPawnBase", "m_aimPunchCache", se::util_vector<angle>);
 };
 
 class player_pawn : public player_pawn_base {

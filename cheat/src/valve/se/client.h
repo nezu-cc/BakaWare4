@@ -26,7 +26,7 @@ struct client_dll {
 
 struct game_resource_service {
     entity_list* get_entity_list() {
-        return *address(this).offset(0x58).cast<entity_list**>();
+        return address(this).offset(0x58).dereference<entity_list*>();
     }
 };
 

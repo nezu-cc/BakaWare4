@@ -50,22 +50,6 @@ void render_name(render::renderer* r, const bbox& bb, const char* name, const cl
 }
 
 bool render_skeleton(render::renderer* r, cs::base_entity* controller, const clr4& clr, bool render, bbox& bb, float padding = 0.f) {
-    constexpr std::array<std::tuple<uint8_t, uint8_t>, 15> tr = {{
-        { 84, 26 },{ 26, 25 },{ 25, 0  }, // right leg
-        { 82, 23 },{ 23, 22 },{ 22, 0  }, // left leg
-        { 5,  92 },{ 92, 11 },{ 11, 12 }, // left arm
-        { 5,  96 },{ 96, 16 },{ 16, 17 }, // right arm
-        { 0,  21 },{ 21, 5  },{ 5,  6  }  // spine
-    }};
-
-    constexpr std::array<std::tuple<uint8_t, uint8_t>, 15> ct = {{
-        { 97, 27 },{ 27,  26 },{ 26, 0  }, // right leg
-        { 95, 24 },{ 24,  23 },{ 23, 0  }, // left leg
-        { 5, 55  },{ 55,  11 },{ 11, 12 }, // left arm
-        { 5, 105 },{ 105, 16 },{ 16, 17 }, // right arm
-        { 0, 21  },{ 21,  5  },{ 5,  6  }  // spine
-    }};
-
     auto game_scene_node = controller->m_pGameSceneNode();
     if (!game_scene_node)
         return false;
@@ -80,30 +64,37 @@ bool render_skeleton(render::renderer* r, cs::base_entity* controller, const clr
     vec2 origin_scr, origin2_scr;
     if (!math::world_to_screen(origin, origin_scr) || !math::world_to_screen(origin2, origin2_scr))
         return false;
-    
-    // FIXME: bone count check
 
-    auto bones = controller->m_iTeamNum() == 2 ? tr : ct;
+    skeleton->calc_world_space_bones(cs::bone_flags::FLAG_HITBOX);
 
-    size_t visible_bones = 0;
-    std::array<vec2, std::tuple_size<decltype(bones)>::value * 2> bone_scrs;
+    auto& model_state = skeleton->m_modelState();
+    cs::model* model = model_state.m_hModel();
+    const auto num_bones = model->num_bones();
+    auto bones = model_state.get_bone_data();
 
-    for (auto& bone : bones) {
-        cs::bone_data bone1, bone2;
-        skeleton->get_bone(bone1, std::get<0>(bone));
-        skeleton->get_bone(bone2, std::get<1>(bone));
+    std::vector<vec2> bone_scrs;
+    bone_scrs.reserve(num_bones * 2);
 
-        vec2 bone1_scr, bone2_scr;
-        if (!math::world_to_screen(bone1.pos, bone1_scr) || !math::world_to_screen(bone2.pos, bone2_scr))
+    for (uint32_t i = 0; i < num_bones; i++) {
+        if (!(model->bone_flags(i) & cs::bone_flags::FLAG_HITBOX)) {
+            continue;
+        }
+
+        auto parent_index = model->bone_parent(i);
+        if (parent_index == -1)
             continue;
 
-        bone_scrs[visible_bones++] = bone1_scr;
-        bone_scrs[visible_bones++] = bone2_scr;
+        vec2 start_scr, end_scr;
+        if (!math::world_to_screen(bones[i].pos, start_scr) || !math::world_to_screen(bones[parent_index].pos, end_scr))
+            continue;
+
+        bone_scrs.push_back(start_scr);
+        bone_scrs.push_back(end_scr);
 
         if (render) {
             r->line(
-                bone1_scr.x, bone1_scr.y,
-                bone2_scr.x, bone2_scr.y,
+                start_scr.x, start_scr.y,
+                end_scr.x, end_scr.y,
                 clr, 1
             );
         }
@@ -112,14 +103,14 @@ bool render_skeleton(render::renderer* r, cs::base_entity* controller, const clr
     bb.x = bb.y = std::numeric_limits<float>::max();
     bb.w = bb.h = -std::numeric_limits<float>::max();
 
-    if (visible_bones == 0)
+    if (bone_scrs.empty())
         return false;
 
-    for (size_t i = 0; i < visible_bones; i++) {
-        bb.x = std::min(bb.x, bone_scrs[i].x);
-        bb.y = std::min(bb.y, bone_scrs[i].y);
-        bb.w = std::max(bb.w, bone_scrs[i].x);
-        bb.h = std::max(bb.h, bone_scrs[i].y);
+    for (const auto& pos : bone_scrs) {
+        bb.x = std::min(bb.x, pos.x);
+        bb.y = std::min(bb.y, pos.y);
+        bb.w = std::max(bb.w, pos.x);
+        bb.h = std::max(bb.h, pos.y);
     }
 
     bb.x = std::floor(bb.x);
