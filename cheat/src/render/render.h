@@ -17,6 +17,7 @@ inline IDXGISwapChain*         swap_chain{ };
 inline ID3D11Device*           device{ };
 inline ID3D11RenderTargetView* render_target_view{ };
 inline ID3D11DeviceContext*    context{ };
+inline std::recursive_mutex    input_mutex{ };
 
 void initialize() noexcept;
 bool set_swap_chain(IDXGISwapChain* swap_chain) noexcept;

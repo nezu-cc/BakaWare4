@@ -140,7 +140,10 @@ void render::render() noexcept {
 
     ImGui_ImplDX11_NewFrame();
     ImGui_ImplWin32_NewFrame();
-    ImGui::NewFrame();
+    {
+        std::scoped_lock lock(input_mutex);
+        ImGui::NewFrame();
+    }
 
     auto r = render::renderer(ImGui::GetBackgroundDrawList());
 
@@ -154,7 +157,10 @@ void render::render() noexcept {
 }
 
 bool render::input(HWND wnd, UINT msg, WPARAM wparam, LPARAM lparam) noexcept {
-    ImGui_ImplWin32_WndProcHandler(wnd, msg, wparam, lparam);
+    {
+        std::scoped_lock lock(input_mutex);
+        ImGui_ImplWin32_WndProcHandler(wnd, msg, wparam, lparam);
+    }
     if (!menu::is_open)
         return false;
     

@@ -107,6 +107,11 @@ void input::process(UINT msg, WPARAM wparam, LPARAM lparam) noexcept
         return;
     }
 
+    // ignore invalid keys
+    if (key >= 0xFF)
+        return;
+
+    // TODO: this is retarded, rework needed to handle edge cases.
     if (key_states[key] == key_state::up && state == key_state::down) {
         if (last_state == key_state::down)
             key_states[key] = key_state::down;
