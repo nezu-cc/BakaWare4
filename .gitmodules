@@ -1,8 +1,3 @@
-[submodule "imgui"]
-	path = cheat/third_party/imgui
-	url = https://github.com/ocornut/imgui.git
-    branch = master
-[submodule "nlohmann-json"]
-	path = cheat/third_party/json
-	url = https://github.com/nlohmann/json.git
-	branch = master
+[submodule "vcpkg"]
+	path = vcpkg
+	url = https://github.com/microsoft/vcpkg.git

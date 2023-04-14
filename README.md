@@ -30,16 +30,31 @@ in debug builds since they are only designed to be loaded in `-insecure`
 
 ## Building
 
-This project uses [CMake](https://cmake.org/) to generate build files and [MSVC](https://visualstudio.microsoft.com/) to compile it.
+This project uses [CMake](https://cmake.org/) to generate build files and [Visual Studio 17 2022](https://visualstudio.microsoft.com/) to compile it.
 
-An example on how to build can be found in github actions [here](.github/workflows/build.yml)
+When cloning the repository, make sure to clone it with the `--recursive` flag to also clone the vcpkg submodule.
+
+### Example
+From the `Developer PowerShell for VS 2022` while in the project directory run:
+
+```powershell
+# list configure presets
+cmake --list-presets
+# configure the project using the "x64-windows" preset
+# NOTE: this will also install the dependencies using vcpkg
+cmake --preset=x64-windows
+# list build presets
+cmake --build --list-presets
+# build the project using the "Release" preset
+cmake --build --preset=Release
+```
+
+Or just open it in your favorite IDE (that supports CMake and CMakePresets) and build it from there.
 
 ### Dependencies
 
-When cloning the repository, make sure to clone it with the `--recursive` flag to also clone the submodules.
-
-- [Dear ImGui](https://github.com/ocornut/imgui) (included as a submodule)
-- [nlohmann JSON](https://github.com/nlohmann/json) (included as a submodule)
+- [Dear ImGui](https://github.com/ocornut/imgui) (included using vcpkg)
+- [nlohmann JSON](https://github.com/nlohmann/json) (included using vcpkg)
 - [ThePerfectInjector](https://github.com/can1357/ThePerfectInjector) (included directly in the source tree)
 
 ## Contributing
