@@ -15,6 +15,27 @@ void menu::render() noexcept {
 
     if (ImGui::Button(XOR("Unhook")))
         cheat::should_unhook = true;
+
+    ImGui::SeparatorText(XOR("Debug config"));
+
+    ImGui::Text(XOR("debug_flags: 0x%X %d"), debug_cfg.debug_flags, debug_cfg.debug_flags);
+    ImGui::NewLine();
+    for (size_t i = 0; i < sizeof(debug_cfg.debug_flags) * CHAR_BIT; i++) {
+        auto mask = (1 << i);
+        bool val = (debug_cfg.debug_flags & mask) != 0;
+        if (i % 8 != 0)
+            ImGui::SameLine();
+        if (ImGui::Checkbox(std::format(XOR("{:02x}"), i).c_str(), &val))
+            debug_cfg.debug_flags ^= mask;
+    }
+    ImGui::SliderInt(XOR("debug_int"), &debug_cfg.debug_int,
+        std::numeric_limits<decltype(debug_cfg.debug_int)>::min() / 2, 
+        std::numeric_limits<decltype(debug_cfg.debug_int)>::max() / 2);
+    ImGui::SliderFloat(XOR("debug_float"), &debug_cfg.debug_float, 
+        std::numeric_limits<decltype(debug_cfg.debug_float)>::min() / 2, 
+        std::numeric_limits<decltype(debug_cfg.debug_float)>::max() / 2);
+
+    ImGui::SeparatorText(XOR("Debug info"));
     
     ImGui::Text(XOR("Global vars: %p"), cheat::global_vars);
     ImGui::Text(XOR("Local controller: %p"), cheat::local.controller);

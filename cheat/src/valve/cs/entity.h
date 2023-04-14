@@ -136,7 +136,7 @@ public:
     NETVAR(m_modelState, "CSkeletonInstance", "m_modelState", model_state);
 
     VIRTUAL_FUNCTION_SIG_ABSOLUTE(get_bone, void, dlls::client, "E8 ? ? ? ? EB 19 48 8B CF", 1, (this, data, index), bone_data& data, int index)
-    VIRTUAL_FUNCTION_SIG(calc_world_space_bones, void, dlls::client, "40 55 56 57 41 54 41 55 41 56 41 57 48 81 EC F0", (this, bone_mask), bone_flags bone_mask)
+    VIRTUAL_FUNCTION_SIG(calc_world_space_bones, void, dlls::client, "40 55 56 57 41 54 41 55 41 56 41 57 48 81 EC F0", (this, bone_mask), uint32_t bone_mask)
 };
 
 class game_scene_node {

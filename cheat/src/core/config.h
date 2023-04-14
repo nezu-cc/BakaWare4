@@ -53,9 +53,17 @@ public:
     )
 };
 
+class debug_config {
+public:
+    uint32_t debug_flags{ 0 };
+    int32_t debug_int{ 0 };
+    float debug_float{ 0.0f };
+};
+
 void load(std::wstring_view file) noexcept;
 void save(std::wstring_view file) noexcept;
 
 }
 
 inline config::conf cfg{ };
+inline config::debug_config debug_cfg{ };

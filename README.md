@@ -27,6 +27,7 @@ for those that care
 
 NOTE: the above only applies to release builds, anything is fair game  
 in debug builds since they are only designed to be loaded in `-insecure`
+NOTE2: Debug builds must be able to be unloaded/unhooked for rapid iteration.
 
 ## Building
 
