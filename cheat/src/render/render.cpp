@@ -4,8 +4,8 @@
 #include "../core/cheat.h"
 #include "menu.h"
 #include "../core/features/features.h"
-#include <backends/imgui_impl_dx11.h>
-#include <backends/imgui_impl_win32.h>
+#include <imgui_impl_dx11.h>
+#include <imgui_impl_win32.h>
 
 extern LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 

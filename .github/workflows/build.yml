@@ -15,14 +15,20 @@ jobs:
     steps:
     - uses: actions/checkout@v3
       with:
-        submodules: 'recursive'
+        submodules: true
 
-    - name: Configure CMake
-      run: cmake -B ${{github.workspace}}/build
+    - name: Install latest CMake.
+      uses: lukka/get-cmake@latest
 
-    - name: Build
-      run: cmake --build ${{github.workspace}}/build --config ${{matrix.build-type}}
+    - name: Setup vcpkg (it does not install any package yet)
+      uses: lukka/run-vcpkg@v11
     
+    - name: Run CMake consuming CMakePreset.json and run vcpkg to build dependencies
+      uses: lukka/run-cmake@v10
+      with:
+        configurePreset: 'x64-windows'
+        buildPreset: ${{matrix.build-type}}
+
     - uses: actions/upload-artifact@v3
       with:
         name: ${{matrix.build-type}}
