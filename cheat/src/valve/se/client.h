@@ -31,10 +31,16 @@ struct game_resource_service {
 };
 
 struct entity_list {
-    template <class ty = cs::base_entity *>
-    VIRTUAL_FUNCTION_SIG_ABSOLUTE(get_base_entity, ty, dlls::client, "8B D3 E8 ? ? ? ? 48 8B F8 48 85 C0 74 76", 3, (this, index), int index)
-    VIRTUAL_FUNCTION_SIG_ABSOLUTE(get_max_entities, int, dlls::client, "33 DB E8 ? ? ? ? 8B 08", 3, (this, max), int* max)
-    
+    template <class ty = cs::base_entity>
+    VIRTUAL_FUNCTION_SIG_ABSOLUTE(get_base_entity, ty*, dlls::client, "8B D3 E8 ? ? ? ? 48 8B F8 48 85 C0 74 76", 3, (this, index), int index)
+
+    inline int32_t get_highest_entity_index() {
+        int32_t max = -1;
+        get_max_entities(&max);
+        return max;
+    }
+private:
+    VIRTUAL_FUNCTION_SIG_ABSOLUTE(get_max_entities, int, dlls::client, "33 DB E8 ? ? ? ? 8B 08", 3, (this, max), int32_t* max)
 };
 
 struct cmd_qangle {

@@ -188,6 +188,11 @@ struct vec3 {
         return (x * v.x + y * v.y + z * v.z);
     }
 
+    float dot_product_abs(const vec3& v) const noexcept
+    {
+        return (std::abs(x * v.x) + std::abs(y * v.y) + std::abs(z * v.z));
+    }
+
     vec3 cross_product(const vec3& v) const noexcept
     {
         return vec3(y * v.z - z * v.y, z * v.x - x * v.z, x * v.y - y * v.x);

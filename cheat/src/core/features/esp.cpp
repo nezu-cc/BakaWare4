@@ -136,7 +136,7 @@ void features::esp::render(render::renderer* r) noexcept {
         return;
 
     for (uint32_t i = 1; i < cheat::global_vars->max_clients; i++) {
-        auto controller = interfaces::entity_list->get_base_entity<cs::player_controller*>(i);
+        auto controller = interfaces::entity_list->get_base_entity<cs::player_controller>(i);
         if (!controller || controller->m_bIsLocalPlayerController() || !controller->m_bPawnIsAlive())
             continue;
         

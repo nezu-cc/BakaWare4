@@ -2,8 +2,10 @@
 
 #include "../../memory/memory.h"
 #include "../se/util.h"
+#include "../se/animation_system.h"
 
 #define ENT_ENTRY_MASK 0x7fff
+#define MAX_STUDIO_BONES 1024
 
 namespace cs {
 
@@ -92,6 +94,7 @@ enum bone_flags : uint32_t {
 };
 
 class base_entity;
+class base_animating;
 
 class handle {
 public:
@@ -109,7 +112,7 @@ public:
 struct alignas(16) bone_data {
     vec3 pos;
     float scale;
-    vec4 rot;
+    quaternion rot;
 };
 
 static_assert(sizeof(bone_data) == 0x20);
@@ -141,6 +144,7 @@ public:
 
 class game_scene_node {
 public:
+    NETVAR(m_nodeToWorld, "CGameSceneNode", "m_nodeToWorld", se::transform);
     NETVAR(m_vecAbsOrigin, "CGameSceneNode", "m_vecAbsOrigin", vec3);
 
     VIRTUAL_FUNCTION(get_skeleton_instance, skeleton_instance*, 8, (this))
@@ -148,29 +152,31 @@ public:
 
 class collision_property {
 public:
+    PAD(sizeof(uintptr_t)); // vtable
+    base_entity* outer;
+
+    NETVAR(m_nSurroundType, "CCollisionProperty", "m_nSurroundType", uint8_t);
     NETVAR(m_vecMins, "CCollisionProperty", "m_vecMins", vec3);
     NETVAR(m_vecMaxs, "CCollisionProperty", "m_vecMaxs", vec3);
 };
 
-class player_weapon_services {
-   public:
-    // NETVAR(m_hActiveWeapon, "CPlayer_WeaponServices", "m_hActiveWeapon",
-    //              CHandle);
-    // NETVAR(m_hMyWeapons, "CPlayer_WeaponServices", "m_hMyWeapons",
-    //               CNetworkUtlVectorBase<CHandle>);
-};
+class entity_identity { };
 
 class entity_instance {
 public:
-    // FIXME: m_pEntity
+    NETVAR(m_pEntity, "CEntityInstance", "m_pEntity", entity_identity*);
 };
 
 class base_entity : public entity_instance {
 public:
-    bool is_player_controller();
-    bool get_bounding_box(bbox& out);
+    bool get_bounding_box(bbox& out, bool hitbox = false) noexcept;
     
     inline bool has_flag(flags flag) noexcept { return m_fFlags() & flag; }
+
+    template <typename T> requires std::derived_from<T, base_entity>
+    inline T* as() {
+        return (T*)this;
+    }
 
     NETVAR(m_pGameSceneNode, "C_BaseEntity", "m_pGameSceneNode", game_scene_node*);
     NETVAR(m_pCollision, "C_BaseEntity", "m_pCollision", collision_property*);
@@ -178,6 +184,15 @@ public:
     NETVAR(m_lifeState, "C_BaseEntity", "m_lifeState", life_state);
     NETVAR(m_MoveType, "C_BaseEntity", "m_MoveType", move_type);
     NETVAR(m_fFlags, "C_BaseEntity", "m_fFlags", flags);
+
+    VIRTUAL_FUNCTION(get_base_animating, base_animating*, 44, (this))
+
+class base_animating : public base_entity {
+public:
+    VIRTUAL_FUNCTION_SIG_ABSOLUTE(get_hitbox_set, se::hitbox_set*, dlls::client, "E8 ? ? ? ? 48 85 C0 75 19 41 B0 01", 1, (this, i), int i)
+    VIRTUAL_FUNCTION_SIG_ABSOLUTE(hitbox_to_world_transforms, uint32_t, dlls::client, "E8 ? ? ? ? 33 F6 4C 63 E0", 1,
+        (this, set, hitbox_to_world, size), const se::hitbox_set* set, mat3x4* hitbox_to_world, int size)
+};
 };
 
 class base_player_controller : public base_entity {
@@ -197,7 +212,6 @@ public:
 class base_player_pawn : public base_entity {
 public:
     NETVAR(m_hController, "C_BasePlayerPawn", "m_hController", handle);
-    NETVAR(m_pWeaponServices, "C_BasePlayerPawn", "m_pWeaponServices", player_weapon_services*);
 };
 
 class player_pawn_base : public base_player_pawn {

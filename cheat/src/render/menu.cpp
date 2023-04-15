@@ -28,12 +28,8 @@ void menu::render() noexcept {
         if (ImGui::Checkbox(std::format(XOR("{:02x}"), i).c_str(), &val))
             debug_cfg.debug_flags ^= mask;
     }
-    ImGui::SliderInt(XOR("debug_int"), &debug_cfg.debug_int,
-        std::numeric_limits<decltype(debug_cfg.debug_int)>::min() / 2, 
-        std::numeric_limits<decltype(debug_cfg.debug_int)>::max() / 2);
-    ImGui::SliderFloat(XOR("debug_float"), &debug_cfg.debug_float, 
-        std::numeric_limits<decltype(debug_cfg.debug_float)>::min() / 2, 
-        std::numeric_limits<decltype(debug_cfg.debug_float)>::max() / 2);
+    ImGui::SliderInt(XOR("debug_int"), &debug_cfg.debug_int, 0, 100);
+    ImGui::SliderFloat(XOR("debug_float"), &debug_cfg.debug_float, 0, 100);
 
     ImGui::SeparatorText(XOR("Debug info"));
     
