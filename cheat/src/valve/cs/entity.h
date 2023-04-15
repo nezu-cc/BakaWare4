@@ -3,6 +3,8 @@
 #include "../../memory/memory.h"
 #include "../se/util.h"
 #include "../se/animation_system.h"
+#include "econ.h"
+#include "vdata.h"
 
 #define ENT_ENTRY_MASK 0x7fff
 #define MAX_STUDIO_BONES 1024
@@ -91,6 +93,12 @@ enum bone_flags : uint32_t {
 	BLEND_PREALIGNED = 0x100000,
 	FLAG_RIGIDLENGTH = 0x200000,
 	FLAG_PROCEDURAL = 0x400000,
+};
+
+enum class weapon_state : uint32_t {
+	WEAPON_NOT_CARRIED = 0x0,
+	WEAPON_IS_CARRIED_BY_PLAYER = 0x1,
+	WEAPON_IS_ACTIVE = 0x2,
 };
 
 class base_entity;
@@ -184,8 +192,11 @@ public:
     NETVAR(m_lifeState, "C_BaseEntity", "m_lifeState", life_state);
     NETVAR(m_MoveType, "C_BaseEntity", "m_MoveType", move_type);
     NETVAR(m_fFlags, "C_BaseEntity", "m_fFlags", flags);
+    NETVAR_OFFSET(m_pVDataBase, "C_BaseEntity", "m_nSubclassID", 0x8, entity_subclass_v_data_base*);
 
     VIRTUAL_FUNCTION(get_base_animating, base_animating*, 44, (this))
+    VIRTUAL_FUNCTION(is_base_player_weapon, bool, 145, (this))
+};
 
 class base_animating : public base_entity {
 public:
@@ -193,6 +204,20 @@ public:
     VIRTUAL_FUNCTION_SIG_ABSOLUTE(hitbox_to_world_transforms, uint32_t, dlls::client, "E8 ? ? ? ? 33 F6 4C 63 E0", 1,
         (this, set, hitbox_to_world, size), const se::hitbox_set* set, mat3x4* hitbox_to_world, int size)
 };
+
+class econ_entity : public base_entity {
+public:
+    NETVAR(m_AttributeManager, "C_EconEntity", "m_AttributeManager", attribute_container)
+};
+
+class base_player_weapon : public econ_entity {
+public:
+    NETVAR(m_iState, "C_BasePlayerWeapon", "m_iState", weapon_state);
+    NETVAR(m_iClip1, "C_BasePlayerWeapon", "m_iClip1", int32_t);
+
+    base_player_weapon_v_data* get_v_data() noexcept {
+        return m_pVDataBase()->as<base_player_weapon_v_data>();
+    }
 };
 
 class base_player_controller : public base_entity {

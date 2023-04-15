@@ -36,6 +36,28 @@ void render_health(render::renderer* r, const bbox& bb, const uint32_t heath) {
     );
 }
 
+void render_ammo(render::renderer* r, const bbox& bb, int cur, int max) {
+    // TODO: ammo color config
+    const clr4 max_clr = clr4::cyan();
+    const clr4 min_clr = clr4::blue();
+
+    const float ratio = static_cast<float>(cur) / max;
+    const auto ammo_clr = clr4::lerp(min_clr, max_clr, ratio);
+    const float ammo_w = std::floor(std::lerp(bb.x, bb.w, ratio));
+
+    r->rect_filled(
+        bb.x - 1, bb.h + 2,
+        bb.w + 1, bb.h + 6,
+        clr4::black(128)
+    );
+    r->rect_filled_multi_color(
+        bb.x, bb.h + 3,
+        ammo_w, bb.h + 5,
+        min_clr, ammo_clr,
+        ammo_clr, min_clr
+    );
+}
+
 void render_name(render::renderer* r, const bbox& bb, const char* name, const clr4& clr) {
     if (!name || !strlen(name))
         return;
@@ -127,6 +149,29 @@ bool render_skeleton(render::renderer* r, cs::base_entity* controller, const clr
     return true;
 }
 
+void render_weapon_name(render::renderer* r, const bbox& bb, cs::base_player_weapon* weapon, const clr4& clr) {
+    auto static_data = weapon->m_AttributeManager().m_Item().get_static_data();
+    if (!static_data)
+        return;
+    
+    auto weapon_name = interfaces::localize->find_safe(static_data->item_base_name);
+    if (!weapon_name || !strlen(weapon_name))
+        return;
+
+    render_name(r, bb, weapon_name, clr);
+}
+
+void render_weapon_ammo(render::renderer* r, const bbox& bb, cs::base_player_weapon* weapon) {
+    auto v_data = weapon->get_v_data();
+    if (!v_data)
+        return;
+
+    const auto ammo = weapon->m_iClip1();
+    const auto max_ammo = v_data->m_iMaxClip1();
+
+    render_ammo(r, bb, ammo, max_ammo);
+}
+
 void features::esp::render(render::renderer* r) noexcept {
     // FIXME: other types of esp
     if (cfg.esp.players.enabled == false)
@@ -164,4 +209,31 @@ void features::esp::render(render::renderer* r) noexcept {
             render_name(r, bb, name.c_str(), clr4::white(220)); // TODO: text color config
         }
     }
+
+    for (uint32_t i = cheat::global_vars->max_clients; i <= interfaces::entity_list->get_highest_entity_index(); i++) {
+        auto entity = interfaces::entity_list->get_base_entity(i);
+        if (!entity)
+            continue;
+
+        if (entity->is_base_player_weapon()) {
+            auto weapon = entity->as<cs::base_player_weapon>();
+
+            if (weapon->m_iState() != cs::weapon_state::WEAPON_NOT_CARRIED)
+                continue;
+            
+            bbox bb;
+            if (!weapon->get_bounding_box(bb, true))
+                continue;
+            
+            if (cfg.esp.weapons.box)
+                render_box(r, bb, clr4::white(220)); // TODO: box color config
+            
+            if (cfg.esp.weapons.name)
+                render_weapon_name(r, bb, weapon, clr4::white(220)); // TODO: text color config
+            
+            if (cfg.esp.weapons.ammo)
+                render_weapon_ammo(r, bb, weapon);
+        }
+    }
+
 }

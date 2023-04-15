@@ -6,7 +6,7 @@ namespace config {
 
 class esp;
 
-class player_visuals {
+class player_esp {
 public:
     bool enabled{ true };
     bool teammates{ false };
@@ -18,18 +18,29 @@ public:
     // bool ammo{ true };
 
     NLOHMANN_DEFINE_TYPE_INTRUSIVE_WITH_DEFAULT(
-        player_visuals, enabled, box, name, health, skeleton
+        player_esp, enabled, box, name, health, skeleton
+    )
+};
+
+class weapon_esp {
+public:
+    bool enabled{ true };
+    bool box{ true };
+    bool name{ true };
+    bool ammo{ true };
+
+    NLOHMANN_DEFINE_TYPE_INTRUSIVE_WITH_DEFAULT(
+        weapon_esp, enabled, box, name, ammo
     )
 };
 
 class esp_config {
 public:
-    player_visuals players{ };
-    // visuals weapons{ };
-    // visuals grenades{ };
+    player_esp players{ };
+    weapon_esp weapons{ };
 
     NLOHMANN_DEFINE_TYPE_INTRUSIVE_WITH_DEFAULT(
-        esp_config, players
+        esp_config, players, weapons
     )
 };
 

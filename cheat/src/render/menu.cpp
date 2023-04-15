@@ -36,6 +36,7 @@ void menu::render() noexcept {
     ImGui::Text(XOR("Global vars: %p"), cheat::global_vars);
     ImGui::Text(XOR("Local controller: %p"), cheat::local.controller);
     ImGui::Text(XOR("Local player pawn: %p"), cheat::local.pawn);
+    ImGui::Text(XOR("highest_entity_index: %d"), interfaces::entity_list->get_highest_entity_index());
     ImGui::Text(XOR("last_mouse_enabled: %d"), input::last_mouse_enabled ? 1 : 0);
 #endif
 
@@ -121,12 +122,19 @@ bool menu::menu_tab::render_button(const ImVec2 size, bool selected, bool vertic
 }
 
 void menu::menu_tab_visuals::render() noexcept {
+    ImGui::SeparatorText(XOR("Players"));
     ImGui::Checkbox(XOR("Enabled"), &cfg.esp.players.enabled);
     ImGui::Checkbox(XOR("Teammates"), &cfg.esp.players.teammates);
     ImGui::Checkbox(XOR("Box"), &cfg.esp.players.box);
     ImGui::Checkbox(XOR("Name"), &cfg.esp.players.name);
     ImGui::Checkbox(XOR("Health"), &cfg.esp.players.health);
     ImGui::Checkbox(XOR("Skeleton"), &cfg.esp.players.skeleton);
+
+    ImGui::SeparatorText(XOR("Weapons"));
+    ImGui::Checkbox(XOR("Enabled"), &cfg.esp.weapons.enabled);
+    ImGui::Checkbox(XOR("Box"), &cfg.esp.weapons.box);
+    ImGui::Checkbox(XOR("Name"), &cfg.esp.weapons.name);
+    ImGui::Checkbox(XOR("Ammo"), &cfg.esp.weapons.ammo);
 }
 
 void menu::menu_tab_misc::render() noexcept {
