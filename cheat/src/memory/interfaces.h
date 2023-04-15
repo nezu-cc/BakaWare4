@@ -59,6 +59,7 @@ inline interface_holder<se::csgo_input*>            csgo_input{ };
 inline interface_holder<se::schema_system*>         schema_system{ };
 inline interface_holder<se::input_stack_system*>    input_stack_system{ };
 inline interface_holder<se::client_mode*>           client_mode{ };
+inline interface_holder<se::localize*>              localize{ };
 
 void initialize() noexcept;
 

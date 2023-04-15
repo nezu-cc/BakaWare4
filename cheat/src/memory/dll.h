@@ -100,6 +100,7 @@ namespace dlls {
     inline dll engine2{ XOR("engine2.dll") };
     inline dll schemasystem{ XOR("schemasystem.dll") };
     inline dll input_system{ XOR("inputsystem.dll") };
+    inline dll localize{ XOR("localize.dll") };
 
     inline void initialize() noexcept
     {

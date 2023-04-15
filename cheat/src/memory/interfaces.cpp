@@ -11,12 +11,14 @@ void interfaces::initialize() noexcept
     collect_interfaces(dlls::engine2);
     collect_interfaces(dlls::schemasystem);
     collect_interfaces(dlls::input_system);
+    collect_interfaces(dlls::localize);
 
     get_cached_interface(client, XOR("Source2Client002"));
     get_cached_interface(engine, XOR("Source2EngineToClient001"));
     get_cached_interface(game_resource, XOR("GameResourceServiceClientV001"));
     get_cached_interface(schema_system, XOR("SchemaSystem_001"));
     get_cached_interface(input_stack_system, XOR("InputStackSystemVersion001"));
+    get_cached_interface(localize, XOR("Localize_001"));
 
     entity_list.initialize(game_resource->get_entity_list());
     csgo_input.initialize<true>(*dlls::client.find(PATTERN("48 8B 0D ? ? ? ? 48 8B 01 FF 50 ? 8B DF")).absolute<se::csgo_input**>(3));
