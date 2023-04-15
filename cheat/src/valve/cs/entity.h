@@ -255,4 +255,30 @@ inline cs::player_controller* get_local_player_controller(int32_t split_screen_s
     return fn(split_screen_slot);
 }
 
-}
+enum class entity_iter_type : uint32_t {
+    UNKNOWN = 0,
+};
+
+class entity_instance_by_class_iter {
+public:
+    entity_instance_by_class_iter(const entity_instance_by_class_iter&) = delete;
+
+    entity_instance_by_class_iter(const char* name) noexcept : entity_instance_by_class_iter(nullptr, name) {}
+
+    entity_instance_by_class_iter(base_entity* start_entity, const char* name) noexcept;
+    
+    inline base_entity* next() noexcept { return next_fn(this); };
+private:
+    inline static base_entity* (__thiscall* next_fn)(entity_instance_by_class_iter*);
+
+    entity_identity* entity; // 0x0
+    void* find_filter; // 0x8
+    entity_iter_type type; // 0x10
+    uint32_t unk1; // 0x14
+    const char* class_name; // 0x18
+    void* unk2; // 0x20
+};
+
+static_assert(sizeof(entity_instance_by_class_iter) == 0x28);
+
+} // namespace cs
