@@ -4,7 +4,6 @@
 #include <Windows.h>
 #include <d3d11.h>
 
-// #include "../valve/cs/cs.h"
 #include "../valve/se/se.h"
 
 #define DECLARE_HOOK(name, ret, base, ... /* args */) namespace name { \

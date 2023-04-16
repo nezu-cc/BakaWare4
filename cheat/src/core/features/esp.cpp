@@ -185,7 +185,7 @@ void features::esp::render(render::renderer* r) noexcept {
         if (!controller || controller->m_bIsLocalPlayerController() || !controller->m_bPawnIsAlive())
             continue;
         
-        auto player = controller->m_hPawn().get_as<cs::player_pawn>();
+        auto player = controller->m_hPawn().get();
         if (!player)
             continue;
         

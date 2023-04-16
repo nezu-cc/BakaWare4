@@ -6,10 +6,6 @@
 #include <limits>
 #include "../../core/input.h"
 
-cs::base_entity *cs::handle::get() noexcept {
-    return interfaces::entity_list->get_base_entity(get_entry_index());
-}
-
 bool cs::base_entity::get_bounding_box(bbox &out, bool hitbox) noexcept {
     collision_property* collision = m_pCollision();
     if (!collision)
@@ -96,4 +92,8 @@ cs::entity_instance_by_class_iter::entity_instance_by_class_iter(base_entity* st
         SIG(next_fn_ptr, dlls::client, "E8 ? ? ? ? 48 85 C0 75 2C 48 8B 0D")
         next_fn = next_fn_ptr.absolute<decltype(next_fn)>();
     }
+}
+
+cs::base_entity *cs::internal::get_entity_by_index(int index) noexcept {
+    return interfaces::entity_list->get_base_entity(index);
 }

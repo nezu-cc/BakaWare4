@@ -64,7 +64,7 @@ void cheat::local_player::update() noexcept {
         pawn = nullptr;
         return;
     }
-    pawn = controller->m_hPawn().get_as<cs::player_pawn>();
+    pawn = controller->m_hPawn().get();
 }
 
 void cheat::local_player::reset() noexcept {

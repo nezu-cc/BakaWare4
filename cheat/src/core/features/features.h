@@ -6,6 +6,8 @@
 #include "../../memory/interfaces.h"
 #include "../../render/render.h"
 #include "../../core/cheat.h"
+#include "../../valve/se/se.h"
+#include "../../valve/cs/cs.h"
 
 namespace features {
 

@@ -11,6 +11,14 @@
 
 namespace cs {
 
+class base_entity;
+class base_animating;
+class player_pawn;
+
+namespace internal {
+    cs::base_entity* get_entity_by_index(int index) noexcept;
+}
+
 enum class life_state : uint8_t {
 	LIFE_ALIVE = 0x0,
 	LIFE_DYING = 0x1,
@@ -101,18 +109,12 @@ enum class weapon_state : uint32_t {
 	WEAPON_IS_ACTIVE = 0x2,
 };
 
-class base_entity;
-class base_animating;
-
+template <typename T>
 class handle {
 public:
-    base_entity* get() noexcept;
-
-    inline int get_entry_index() noexcept { return m_Index & ENT_ENTRY_MASK; }
-    template <typename T>
-    inline T* get_as() {
-        return (T*)(get());
-    }
+    inline T* get() noexcept {
+        return internal::get_entity_by_index(m_Index & ENT_ENTRY_MASK)->as<T>();
+    };
 
     uintptr_t m_Index;
 };
@@ -223,7 +225,7 @@ public:
 class base_player_controller : public base_entity {
 public:
     NETVAR(m_steamID, "CBasePlayerController", "m_steamID", uint64_t);
-    NETVAR(m_hPawn, "CBasePlayerController", "m_hPawn", handle);
+    NETVAR(m_hPawn, "CBasePlayerController", "m_hPawn", handle<player_pawn>);
     NETVAR(m_bIsLocalPlayerController, "CBasePlayerController", "m_bIsLocalPlayerController", bool);
 };
 
@@ -236,7 +238,7 @@ public:
 
 class base_player_pawn : public base_entity {
 public:
-    NETVAR(m_hController, "C_BasePlayerPawn", "m_hController", handle);
+    NETVAR(m_hController, "C_BasePlayerPawn", "m_hController", handle<base_player_controller>);
 };
 
 class player_pawn_base : public base_player_pawn {
