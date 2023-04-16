@@ -36,7 +36,10 @@ void render_health(render::renderer* r, const bbox& bb, const uint32_t heath) {
     );
 }
 
-void render_ammo(render::renderer* r, const bbox& bb, int cur, int max) {
+float render_ammo(render::renderer* r, const bbox& bb, int cur, int max) {
+    if (max <= 0)
+        return 0.f;
+
     // TODO: ammo color config
     const clr4 max_clr = clr4::cyan();
     const clr4 min_clr = clr4::blue();
@@ -56,16 +59,18 @@ void render_ammo(render::renderer* r, const bbox& bb, int cur, int max) {
         min_clr, ammo_clr,
         ammo_clr, min_clr
     );
+
+    return 6; // size
 }
 
-void render_name(render::renderer* r, const bbox& bb, const char* name, const clr4& clr) {
+void render_name(render::renderer* r, const bbox& bb, const char* name, const clr4& clr, bool bottom = false, float offset = 1.f) {
     if (!name || !strlen(name))
         return;
 
-    const auto name_size = r->calc_text_size(name).x;
+    const auto name_size = r->calc_text_size(name);
     r->text(
-        bb.center_x() - (name_size / 2),
-        bb.y - 16,
+        bb.center_x() - (name_size.x / 2),
+        bottom ? bb.h + offset : bb.y - (offset + name_size.y + 2),
         clr,
         name
     );
@@ -149,7 +154,7 @@ bool render_skeleton(render::renderer* r, cs::base_entity* controller, const clr
     return true;
 }
 
-void render_weapon_name(render::renderer* r, const bbox& bb, cs::base_player_weapon* weapon, const clr4& clr) {
+void render_weapon_name(render::renderer* r, const bbox& bb, cs::base_player_weapon* weapon, const clr4& clr, bool bottom = false, float offset = 1.f) {
     auto static_data = weapon->m_AttributeManager().m_Item().get_static_data();
     if (!static_data)
         return;
@@ -158,18 +163,36 @@ void render_weapon_name(render::renderer* r, const bbox& bb, cs::base_player_wea
     if (!weapon_name || !strlen(weapon_name))
         return;
 
-    render_name(r, bb, weapon_name, clr);
+    render_name(r, bb, weapon_name, clr, bottom, offset);
 }
 
-void render_weapon_ammo(render::renderer* r, const bbox& bb, cs::base_player_weapon* weapon) {
+float render_weapon_ammo(render::renderer* r, const bbox& bb, cs::base_player_weapon* weapon) {
     auto v_data = weapon->get_v_data();
     if (!v_data)
-        return;
+        return 0.f;
 
     const auto ammo = weapon->m_iClip1();
     const auto max_ammo = v_data->m_iMaxClip1();
 
-    render_ammo(r, bb, ammo, max_ammo);
+    return render_ammo(r, bb, ammo, max_ammo);
+}
+
+void render_player_weapon(render::renderer* r, const bbox& bb, cs::base_player_pawn* player, const clr4& clr) {
+    cs::player_weapon_services* weapon_services = player->m_pWeaponServices();
+    if (!weapon_services)
+        return;
+    
+    auto weapon = weapon_services->m_hActiveWeapon().get();
+    if (!weapon)
+        return;
+
+    float offset = 1.f;
+
+    if (cfg.esp.players.weapon_ammo)
+        offset += render_weapon_ammo(r, bb, weapon);
+
+    if (cfg.esp.players.weapon_name)
+        render_weapon_name(r, bb, weapon, clr, true, offset);
 }
 
 void features::esp::render(render::renderer* r) noexcept {
@@ -208,6 +231,9 @@ void features::esp::render(render::renderer* r) noexcept {
                 name.insert(0, "BOT ");
             render_name(r, bb, name.c_str(), clr4::white(220)); // TODO: text color config
         }
+
+        if (cfg.esp.players.weapon_name || cfg.esp.players.weapon_ammo)
+            render_player_weapon(r, bb, player, clr4::white(220)); // TODO: text color config
     }
 
     for (uint32_t i = cheat::global_vars->max_clients; i <= interfaces::entity_list->get_highest_entity_index(); i++) {
@@ -215,7 +241,7 @@ void features::esp::render(render::renderer* r) noexcept {
         if (!entity)
             continue;
 
-        if (entity->is_base_player_weapon()) {
+        if (cfg.esp.weapons.enabled && entity->is_base_player_weapon()) {
             auto weapon = entity->as<cs::base_player_weapon>();
 
             if (weapon->m_iState() != cs::weapon_state::WEAPON_NOT_CARRIED)

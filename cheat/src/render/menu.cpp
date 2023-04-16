@@ -123,18 +123,21 @@ bool menu::menu_tab::render_button(const ImVec2 size, bool selected, bool vertic
 
 void menu::menu_tab_visuals::render() noexcept {
     ImGui::SeparatorText(XOR("Players"));
-    ImGui::Checkbox(XOR("Enabled"), &cfg.esp.players.enabled);
-    ImGui::Checkbox(XOR("Teammates"), &cfg.esp.players.teammates);
-    ImGui::Checkbox(XOR("Box"), &cfg.esp.players.box);
-    ImGui::Checkbox(XOR("Name"), &cfg.esp.players.name);
-    ImGui::Checkbox(XOR("Health"), &cfg.esp.players.health);
-    ImGui::Checkbox(XOR("Skeleton"), &cfg.esp.players.skeleton);
+    ImGui::Checkbox(XOR("Enabled##Players"), &cfg.esp.players.enabled);
+    ImGui::Checkbox(XOR("Teammates##Players"), &cfg.esp.players.teammates);
+    ImGui::Checkbox(XOR("Box##Players"), &cfg.esp.players.box);
+    ImGui::Checkbox(XOR("Skeleton##Players"), &cfg.esp.players.skeleton);
+    ImGui::Checkbox(XOR("Name##Players"), &cfg.esp.players.name);
+    ImGui::Checkbox(XOR("Health##Players"), &cfg.esp.players.health);
+    ImGui::Checkbox(XOR("Weapon name##Players"), &cfg.esp.players.weapon_name);
+    ImGui::Checkbox(XOR("Weapon ammo##Players"), &cfg.esp.players.weapon_ammo);
+    
 
     ImGui::SeparatorText(XOR("Weapons"));
-    ImGui::Checkbox(XOR("Enabled"), &cfg.esp.weapons.enabled);
-    ImGui::Checkbox(XOR("Box"), &cfg.esp.weapons.box);
-    ImGui::Checkbox(XOR("Name"), &cfg.esp.weapons.name);
-    ImGui::Checkbox(XOR("Ammo"), &cfg.esp.weapons.ammo);
+    ImGui::Checkbox(XOR("Enabled##Weapons"), &cfg.esp.weapons.enabled);
+    ImGui::Checkbox(XOR("Box##Weapons"), &cfg.esp.weapons.box);
+    ImGui::Checkbox(XOR("Name##Weapons"), &cfg.esp.weapons.name);
+    ImGui::Checkbox(XOR("Ammo##Weapons"), &cfg.esp.weapons.ammo);
 }
 
 void menu::menu_tab_misc::render() noexcept {

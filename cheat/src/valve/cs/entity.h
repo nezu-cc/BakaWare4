@@ -14,6 +14,7 @@ namespace cs {
 class base_entity;
 class base_animating;
 class player_pawn;
+class player_weapon_services;
 
 namespace internal {
     cs::base_entity* get_entity_by_index(int index) noexcept;
@@ -239,6 +240,7 @@ public:
 class base_player_pawn : public base_entity {
 public:
     NETVAR(m_hController, "C_BasePlayerPawn", "m_hController", handle<base_player_controller>);
+    NETVAR(m_pWeaponServices, "C_BasePlayerPawn", "m_pWeaponServices", player_weapon_services*);
 };
 
 class player_pawn_base : public base_player_pawn {

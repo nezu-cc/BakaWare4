@@ -10,15 +10,15 @@ class player_esp {
 public:
     bool enabled{ true };
     bool teammates{ false };
-    bool health{ true };
     bool box{ true };
-    bool name{ true };
-    // bool weapon{ true };
+    bool health{ true };
     bool skeleton{ true };
-    // bool ammo{ true };
+    bool name{ true };
+    bool weapon_name{ true };
+    bool weapon_ammo{ true };
 
     NLOHMANN_DEFINE_TYPE_INTRUSIVE_WITH_DEFAULT(
-        player_esp, enabled, box, name, health, skeleton
+        player_esp, enabled, teammates, box, health, skeleton, name, weapon_name, weapon_ammo
     )
 };
 

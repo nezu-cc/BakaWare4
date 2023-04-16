@@ -5,3 +5,4 @@
 #include "econ.h"
 #include "vdata.h"
 #include "entity.h"
+#include "player.h"
