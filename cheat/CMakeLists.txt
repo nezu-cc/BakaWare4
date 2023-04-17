@@ -12,3 +12,7 @@ target_link_libraries(BakaWare4 PRIVATE nlohmann_json::nlohmann_json imgui::imgu
 
 target_compile_features(BakaWare4 PUBLIC c_std_17 cxx_std_20)
 target_compile_options(BakaWare4 PUBLIC /Zc:threadSafeInit- /sdl- /GS- /guard:cf-)
+
+if (VCPKG_TARGET_TRIPLET MATCHES "x64-windows-static")
+    set_property(TARGET BakaWare4 PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+endif ()

@@ -51,7 +51,7 @@ From the `Developer PowerShell for VS 2022` while in the project directory run:
 cmake --list-presets
 # configure the project using the "x64-windows" preset
 # NOTE: this will also install the dependencies using vcpkg
-cmake --preset=x64-windows
+cmake --preset=x64-windows-static
 # list build presets
 cmake --build --list-presets
 # build the project using the "Release" preset
