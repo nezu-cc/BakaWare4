@@ -1,6 +1,7 @@
 #pragma once
 
 #include <nlohmann/json.hpp>
+#include "../base/types/color.h"
 
 namespace config {
 
@@ -69,6 +70,7 @@ public:
     uint32_t debug_flags{ 0 };
     int32_t debug_int{ 0 };
     float debug_float{ 0.0f };
+    clr4 debug_color = clr4::white(255);
 };
 
 void load(std::wstring_view file) noexcept;

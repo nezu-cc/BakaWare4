@@ -21,6 +21,8 @@ struct clr4 {
         : r(static_cast<uint8_t>(r * 255)), g(static_cast<uint8_t>(g * 255)),
           b(static_cast<uint8_t>(b * 255)), a(static_cast<uint8_t>(a * 255)) { }
 
+    operator uint32_t() const noexcept { return rgba; }
+
     float r_base() const noexcept { return r / 255.f; }
     float g_base() const noexcept { return g / 255.f; }
     float b_base() const noexcept { return b / 255.f; }

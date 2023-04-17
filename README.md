@@ -5,12 +5,20 @@ Counter-Strike 2 cheat
 ## Features
 
 - ESP
-  - Box
-  - Name
-  - Health
-  - Skeleton
+  - player
+    - Box
+    - Name
+    - Health
+    - Skeleton
+    - weapon
+    - ammo
+  - weapon
+    - Box
+    - Name
+    - Ammo
 - Misc
   - bunnyhop
+  - recoil crosshair
 
 **THIS CHEAT IS STILL WIP, MORE TO COME SOON:tm:**
 
@@ -84,7 +92,7 @@ A: This is a forth instalment in my counter-strike cheat making adventure.
 A: Idk, I'm bad at naming things and it was a long time ago when this name was chosen.
 
 - Q: What is the injector included?  
-A: It's (ThePerfectInjector)[https://github.com/can1357/ThePerfectInjector]. It maps kernel space memory into
+A: It's [ThePerfectInjector](https://github.com/can1357/ThePerfectInjector). It maps kernel space memory into
 usermode by manipulating page tables. Windows will actively refuse to interact with memory addresses above
 0x7FFFFFFEFFFF through their APIs making it basically invisible to external usermode scanners. These pages
 are still perfectly valid though and the CPU will happily execute them. That's not to say it's fully undetectable.
@@ -98,5 +106,5 @@ A: Nothing out there is perfect, and neither is this. This is a cheat designed t
 If you find it useful that's great. Releasing it because why not, I'm not going to sell it anyway.
 
 - Q: What is the base?  
-A: This cheat was heavily inspired by (lstrsrt/csgo_internal_base)[https://github.com/lstrsrt/csgo_internal_base] but
+A: This cheat was heavily inspired by [lstrsrt/csgo_internal_base](https://github.com/lstrsrt/csgo_internal_base) but
 ported to CS2 and with some slight changes. Over time the layout will probably drift further and further away from it though.

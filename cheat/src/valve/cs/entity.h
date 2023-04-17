@@ -241,16 +241,22 @@ class base_player_pawn : public base_entity {
 public:
     NETVAR(m_hController, "C_BasePlayerPawn", "m_hController", handle<base_player_controller>);
     NETVAR(m_pWeaponServices, "C_BasePlayerPawn", "m_pWeaponServices", player_weapon_services*);
+
+    base_player_weapon* get_active_weapon() noexcept;
 };
 
 class player_pawn_base : public base_player_pawn {
 public:
     NETVAR(m_iHealth, "C_CSPlayerPawnBase", "m_aimPunchCache", se::util_vector<angle>);
+
+    VIRTUAL_FUNCTION(get_view_angles, angle*, 156, (this, ang), angle* ang)
+    VIRTUAL_FUNCTION(get_aim_punch, angle*, 314, (this, ang, full), angle* ang, bool full)
 };
 
 class player_pawn : public player_pawn_base {
 public:
     VIRTUAL_FUNCTION_SIG(is_enemy, bool, dlls::client, "40 57 48 83 EC 40 48 8B F9 48 85", (this, other_player), player_pawn* other_player)
+    VIRTUAL_FUNCTION_SIG_ABSOLUTE(get_pos, void, dlls::client, "E8 ? ? ? ? F3 0F 10 6D 7F", 1, (this, pos, forward, right, up), vec3* pos, vec3* forward, vec3* right, vec3* up)
 };
 
 inline cs::player_controller* get_local_player_controller(int32_t split_screen_slot = 0) noexcept {

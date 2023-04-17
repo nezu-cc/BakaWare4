@@ -3,6 +3,7 @@
 #include <imgui.h>
 #include <imgui_internal.h>
 #include "../core/config.h"
+#include "imgui_extra.h"
 
 #define ADD_VERSION(str) (str " " BAKAWARE_VERSION)
 
@@ -19,17 +20,17 @@ void menu::render() noexcept {
     ImGui::SeparatorText(XOR("Debug config"));
 
     ImGui::Text(XOR("debug_flags: 0x%X %d"), debug_cfg.debug_flags, debug_cfg.debug_flags);
-    ImGui::NewLine();
     for (size_t i = 0; i < sizeof(debug_cfg.debug_flags) * CHAR_BIT; i++) {
         auto mask = (1 << i);
         bool val = (debug_cfg.debug_flags & mask) != 0;
         if (i % 8 != 0)
             ImGui::SameLine();
-        if (ImGui::Checkbox(std::format(XOR("{:02x}"), i).c_str(), &val))
+        if (ImGui::Checkbox(std::format(XOR("{:02}"), i + 1).c_str(), &val))
             debug_cfg.debug_flags ^= mask;
     }
     ImGui::SliderInt(XOR("debug_int"), &debug_cfg.debug_int, 0, 100);
     ImGui::SliderFloat(XOR("debug_float"), &debug_cfg.debug_float, 0, 100);
+    ImGui::ColorEdit4(XOR("debug_color"), &debug_cfg.debug_color);
 
     ImGui::SeparatorText(XOR("Debug info"));
     
@@ -142,4 +143,5 @@ void menu::menu_tab_visuals::render() noexcept {
 
 void menu::menu_tab_misc::render() noexcept {
     ImGui::Checkbox(XOR("Bunny hop"), &cfg.misc.bunny_hop);
+    ImGui::Checkbox(XOR("Recoil crosshair"), &cfg.misc.reoil_crosshair);
 }

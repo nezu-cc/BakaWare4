@@ -1,4 +1,5 @@
 #include "entity.h"
+#include "player.h"
 
 #include "../../memory/interfaces.h"
 #include "../../base/math.h"
@@ -56,10 +57,10 @@ bool cs::base_entity::get_bounding_box(bbox &out, bool hitbox) noexcept {
         if (!math::world_to_screen(point, screen))
             return false;
 
-        out.x = std::floor(std::min(out.x, screen.x));
-        out.y = std::floor(std::min(out.y, screen.y));
-        out.w = std::floor(std::max(out.w, screen.x));
-        out.h = std::floor(std::max(out.h, screen.y));
+        out.x = std::min(out.x, screen.x);
+        out.y = std::min(out.y, screen.y);
+        out.w = std::max(out.w, screen.x);
+        out.h = std::max(out.h, screen.y);
     }
 
     const float width = out.w - out.x;
@@ -96,4 +97,12 @@ cs::entity_instance_by_class_iter::entity_instance_by_class_iter(base_entity* st
 
 cs::base_entity *cs::internal::get_entity_by_index(int index) noexcept {
     return interfaces::entity_list->get_base_entity(index);
+}
+
+cs::base_player_weapon *cs::base_player_pawn::get_active_weapon() noexcept {
+    auto weapon_services = m_pWeaponServices();
+    if (!weapon_services)
+        return nullptr;
+    
+    return weapon_services->m_hActiveWeapon().get();
 }

@@ -89,7 +89,7 @@ bool render_skeleton(render::renderer* r, cs::base_entity* controller, const clr
     auto& origin = game_scene_node->m_vecAbsOrigin();
     auto origin2 = origin + vec3(0, 0, 32);
     vec2 origin_scr, origin2_scr;
-    if (!math::world_to_screen(origin, origin_scr) || !math::world_to_screen(origin2, origin2_scr))
+    if (!math::world_to_screen(origin, origin_scr, false) || !math::world_to_screen(origin2, origin2_scr, false))
         return false;
 
     skeleton->calc_world_space_bones(cs::bone_flags::FLAG_HITBOX);
@@ -112,7 +112,7 @@ bool render_skeleton(render::renderer* r, cs::base_entity* controller, const clr
             continue;
 
         vec2 start_scr, end_scr;
-        if (!math::world_to_screen(bones[i].pos, start_scr) || !math::world_to_screen(bones[parent_index].pos, end_scr))
+        if (!math::world_to_screen(bones[i].pos, start_scr, false) || !math::world_to_screen(bones[parent_index].pos, end_scr, false))
             continue;
 
         bone_scrs.push_back(start_scr);
@@ -178,11 +178,7 @@ float render_weapon_ammo(render::renderer* r, const bbox& bb, cs::base_player_we
 }
 
 void render_player_weapon(render::renderer* r, const bbox& bb, cs::base_player_pawn* player, const clr4& clr) {
-    cs::player_weapon_services* weapon_services = player->m_pWeaponServices();
-    if (!weapon_services)
-        return;
-    
-    auto weapon = weapon_services->m_hActiveWeapon().get();
+    auto weapon = player->get_active_weapon();
     if (!weapon)
         return;
 

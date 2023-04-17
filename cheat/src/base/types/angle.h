@@ -176,6 +176,6 @@ template<>
 struct std::formatter<angle> : std::formatter<std::string> {
     auto format(angle a, format_context& ctx)
     {
-        return formatter<string>::format(std::format("[{}, {}, {}]", a.x, a.y, a.z), ctx);
+        return formatter<string>::format(std::format("[{:.02f}, {:.02f}, {:.02f}]", a.x, a.y, a.z), ctx);
     }
 };
