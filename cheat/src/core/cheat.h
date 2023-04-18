@@ -33,6 +33,7 @@ namespace cheat {
         }
     };
 
+    inline uintptr_t base{ };
     inline local_player local{ };
     inline bool should_unhook{ };
     inline d2 screen_size{ };

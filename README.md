@@ -28,7 +28,7 @@ for those that care
 
 - No modifying any read only memory sections
 - No hooks on globally exported interfaces
-- No SEH/VEH (except for the one that is required to disable DEP when mapped using perfect injector)
+- No SEH
 - No TLS
 - No persistent threads
 - Must load and function correctly when mapped above 0x7FFFFFFEFFFF ;)

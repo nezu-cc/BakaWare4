@@ -1,27 +1,14 @@
 #include "cheat.h"
 #include "../render/menu.h"
 #include "../valve/cs/cs.h"
-
-LONG CALLBACK veh_handler(EXCEPTION_POINTERS* ExceptionInfo) {
-	auto exception_code = ExceptionInfo->ExceptionRecord->ExceptionCode;
-	auto exception_info0 = ExceptionInfo->ExceptionRecord->ExceptionInformation[0];
-	auto exception_info1 = ExceptionInfo->ExceptionRecord->ExceptionInformation[1];
-
-    if (exception_code == EXCEPTION_ACCESS_VIOLATION) {
-        // DEP Violation
-        if (exception_info0 == 8) {
-            // ignore DEP violation above 0x7FFFFFFEFFFF
-            if (exception_info1 >= 0x7FFFFFFEFFFF)
-                return EXCEPTION_CONTINUE_EXECUTION;
-        }
-    }
-
-	return EXCEPTION_CONTINUE_SEARCH;
-}
+#include "crash_handler.h"
 
 void cheat::initialize(uintptr_t base) noexcept {
+    cheat::base = base;
+
     dlls::initialize();
     logger::initialize(XOR("BakaWare"));
+    crash_handler::initialize();
     dlls::add_to_trusted_list(base);
     memory::erase_pe_headers(base);
     interfaces::initialize();
@@ -29,13 +16,7 @@ void cheat::initialize(uintptr_t base) noexcept {
     render::initialize();
     input::initialize(menu::is_open);
     hooks::initialize();
-    // cfg::initialize();
-
-    // bypass DEP if mapped above 0x7FFFFFFEFFFF
-    if (base >= 0x7FFFFFFEFFFF) {
-        PVOID handle = AddVectoredExceptionHandler(FALSE, veh_handler);
-        LOG_INFO(XOR("BEP bypass handler at: {}"), handle);
-    }
+    // config::initialize();
 
     LOG_ERROR(XOR("BakaWare initialized. Base: {} Last full build: {} {}"), (void*)base, __DATE__, __TIME__);
 }
@@ -44,8 +25,8 @@ DWORD cheat::end(LPVOID instance) noexcept {
     input::unlock_cursor(false);
     hooks::end();
     logger::end();
+    crash_handler::end();
 
-    // FreeLibraryAndExitThread(static_cast<HMODULE>(instance), EXIT_SUCCESS);
     return EXIT_SUCCESS;
 }
 
