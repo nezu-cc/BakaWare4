@@ -23,3 +23,8 @@ bool __fastcall hooks::create_move::fn(se::csgo_input* cs_input, uint32_t split_
 
     return ret;
 }
+
+void __fastcall hooks::on_render_start::fn(se::view_render* rcx) {
+    original(rcx);
+    math::update_view_matrix();
+}

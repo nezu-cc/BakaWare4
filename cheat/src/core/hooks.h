@@ -28,6 +28,7 @@ namespace hooks {
     DECLARE_HOOK(create_move, bool, se::csgo_input, uint32_t, uint8_t);
     DECLARE_HOOK(level_init, void, se::client_mode, const char*);
     DECLARE_HOOK(level_shutdown, void, se::client_mode);
+    DECLARE_HOOK(on_render_start, void, se::view_render);
     
 
     // DECLARE_HOOK(level_init_post_entity, void, se::client_dll)

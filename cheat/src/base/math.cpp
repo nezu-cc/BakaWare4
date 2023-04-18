@@ -4,15 +4,41 @@
 #include "../core/cheat.h"
 #include <numbers>
 
+static mat4x4 view_matrix;
+static bool view_matrix_initialized = false;
+
+void math::update_view_matrix() noexcept {
+    SIG(world_to_projection_ptr, dlls::client, "48 8D 05 ? ? ? ? 48 8B D3 4C 8D 05")
+    static auto world_to_projection = world_to_projection_ptr.absolute<mat4x4*>(3);
+    view_matrix = *world_to_projection;
+    view_matrix_initialized = true;
+}
+
 bool math::world_to_screen(const vec3 &world, vec2 &screen, bool floor) noexcept {
-    SIG(function_ptr, dlls::client, "E8 ? ? ? ? F3 0F 10 45 ? 8B D0")
-    auto function = function_ptr.absolute<bool(__thiscall*)(const vec3&, vec3&)>();
-    vec3 screen_ret;
-    if (function(world, screen_ret))
+    if (!view_matrix_initialized)
+        return false;
+
+    const float z = view_matrix[3][0] * world.x +
+                    view_matrix[3][1] * world.y +
+                    view_matrix[3][2] * world.z +
+                    view_matrix[3][3];
+
+    if (z < 0.001f)
         return false;
     
-    screen.x = (1.0f + screen_ret.x) * (cheat::screen_size.x * 0.5f);
-    screen.y = (1.0f - screen_ret.y) * (cheat::screen_size.y * 0.5f);
+    screen = cheat::screen_size / 2;
+    screen.x *= 1.0f + (
+        view_matrix[0][0] * world.x + 
+        view_matrix[0][1] * world.y +
+        view_matrix[0][2] * world.z + 
+        view_matrix[0][3]
+    ) / z;
+    screen.y *= 1.0f - (
+        view_matrix[1][0] * world.x + 
+        view_matrix[1][1] * world.y +
+        view_matrix[1][2] * world.z + 
+        view_matrix[1][3]
+    ) / z;
 
     if (floor) {
         screen.x = std::floor(screen.x);

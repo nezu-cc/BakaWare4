@@ -1,5 +1,6 @@
 #pragma once
 #include <imgui.h>
+#include "dimension.h"
 
 struct vec2 {
     float x{ }, y{ };
@@ -8,6 +9,8 @@ struct vec2 {
     constexpr vec2(float x, float y) noexcept
         : x(x), y(y) { }
     constexpr vec2(ImVec2 v) noexcept
+        : x(v.x), y(v.y) { }
+    constexpr vec2(d2 v) noexcept
         : x(v.x), y(v.y) { }
 };
 

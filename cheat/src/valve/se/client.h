@@ -80,6 +80,10 @@ struct per_user_input {
 static_assert(sizeof(per_user_input) == sizeof(user_cmd) * (150 + 4)); // 0x4360
 
 struct csgo_input {
+    static csgo_input* get() noexcept {
+        return *dlls::client.find(PATTERN("48 8B 0D ? ? ? ? 48 8B 01 FF 50 ? 8B DF")).absolute<se::csgo_input**>(3);
+    }
+
     VIRTUAL_FUNCTION_SIG(set_cursor_pos, void, dlls::client, "44 89 44 24 18 89 54 24 10 48 83", (this, x, y), uint32_t x, uint32_t y)
 
     user_cmd* get_user_cmd(int split_screen_index) {
@@ -95,7 +99,9 @@ private:
 };
 
 struct client_mode {
-
+    static client_mode* get() noexcept {
+        return dlls::client.find(PATTERN("48 8D 0D ? ? ? ? 48 69 C0 ? ? ? ? 48 03 C1 C3 CC CC")).absolute<se::client_mode*>(3);
+    }
 };
 
 struct global_vars {
@@ -115,6 +121,13 @@ public:
     PAD(0x130)
     char* current_map;
     char* current_mapname;
+};
+
+struct view_render {
+    static view_render* get() noexcept {
+        SIG(function_ptr, dlls::client, "E8 ? ? ? ? 44 8B CB 4C 8D 44 24")
+        return function_ptr.absolute<view_render*(__fastcall*)()>()();
+    }
 };
 
 }
