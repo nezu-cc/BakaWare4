@@ -34,4 +34,4 @@ jobs:
       with:
         name: ${{matrix.build-type}}
         path: |
-          ${{github.workspace}}/bin/${{matrix.build-type}}
+          ${{github.workspace}}/build/bin/${{matrix.build-type}}
