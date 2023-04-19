@@ -245,6 +245,6 @@ template<>
 struct std::formatter<vec4> : std::formatter<std::string> {
     auto format(vec4 v, format_context& ctx)
     {
-        return formatter<string>::format(std::format("[{}, {}, {}, {}]", v.x, v.y, v.z, v.w), ctx);
+        return formatter<string>::format(std::format("[{:.02f}, {:.02f}, {:.02f}, {:.02f}]", v.x, v.y, v.z, v.w), ctx);
     }
 };

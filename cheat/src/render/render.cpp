@@ -150,6 +150,7 @@ void render::render() noexcept {
     features::render(&r);
 
     menu::render();
+    debug_overlay::render();
 
     ImGui::Render();
     context->OMSetRenderTargets(1, &render_target_view, nullptr);
