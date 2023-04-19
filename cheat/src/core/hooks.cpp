@@ -25,6 +25,8 @@ void hooks::initialize() noexcept
     SET_VT_HOOK(interfaces::client_mode, level_init, 23);
     SET_VT_HOOK(interfaces::client_mode, level_shutdown, 24);
     SET_VT_HOOK(interfaces::view_render, on_render_start, 4);
+    SET_VT_HOOK(interfaces::entity_list, on_add_entity, 14);
+    SET_VT_HOOK(interfaces::entity_list, on_remove_entity, 15);
 
     LOG_INFO(XOR("Hooks initialized."));
 }

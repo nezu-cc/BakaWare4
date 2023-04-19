@@ -11,6 +11,7 @@
 
 namespace cs {
 
+class entity_instance;
 class base_entity;
 class base_animating;
 class player_pawn;
@@ -113,11 +114,16 @@ enum class weapon_state : uint32_t {
 template <typename T>
 class handle {
 public:
-    inline T* get() noexcept {
-        return internal::get_entity_by_index(m_Index & ENT_ENTRY_MASK)->as<T>();
-    };
-
     uintptr_t m_Index;
+
+    inline int get_index() const noexcept {
+        return m_Index & ENT_ENTRY_MASK;
+    }
+
+    template <typename U = T> requires std::derived_from<U, T>
+    inline U* get() const noexcept {
+        return internal::get_entity_by_index(get_index())->as<U>();
+    };
 };
 
 struct alignas(16) bone_data {
@@ -176,6 +182,17 @@ class entity_identity { };
 class entity_instance {
 public:
     NETVAR(m_pEntity, "CEntityInstance", "m_pEntity", entity_identity*);
+
+    template<typename T> requires std::derived_from<T, entity_instance>
+    VIRTUAL_FUNCTION(get_ref_handle, void, 2, (this, handle), handle<T>* handle)
+
+    template<typename T> requires std::derived_from<T, entity_instance>
+    auto get_ref_handle() noexcept {
+        handle<T> handle;
+        get_ref_handle(&handle);
+        return handle;
+    }
+
 };
 
 class base_entity : public entity_instance {
@@ -185,7 +202,7 @@ public:
     inline bool has_flag(flags flag) noexcept { return m_fFlags() & flag; }
 
     template <typename T> requires std::derived_from<T, base_entity>
-    inline T* as() {
+    inline T* as() const noexcept {
         return (T*)this;
     }
 
@@ -198,6 +215,7 @@ public:
     NETVAR_OFFSET(m_pVDataBase, "C_BaseEntity", "m_nSubclassID", 0x8, entity_subclass_v_data_base*);
 
     VIRTUAL_FUNCTION(get_base_animating, base_animating*, 44, (this))
+    VIRTUAL_FUNCTION(is_base_player_controller, bool, 139, (this))
     VIRTUAL_FUNCTION(is_base_player_weapon, bool, 145, (this))
 };
 
@@ -242,7 +260,9 @@ public:
     NETVAR(m_hController, "C_BasePlayerPawn", "m_hController", handle<base_player_controller>);
     NETVAR(m_pWeaponServices, "C_BasePlayerPawn", "m_pWeaponServices", player_weapon_services*);
 
-    base_player_weapon* get_active_weapon() noexcept;
+    bool get_bounding_box(bbox &out, bool bones = false) noexcept;
+
+    base_player_weapon *get_active_weapon() noexcept;
 };
 
 class player_pawn_base : public base_player_pawn {

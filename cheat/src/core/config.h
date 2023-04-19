@@ -48,7 +48,7 @@ public:
 class misc_config {
 public:
     bool reoil_crosshair { true };
-    bool bunny_hop { true };
+    bool bunny_hop { false };
 
     NLOHMANN_DEFINE_TYPE_INTRUSIVE_WITH_DEFAULT(
         misc_config, reoil_crosshair, bunny_hop

@@ -1,4 +1,5 @@
 #include "features.h"
+#include "../entity_cache.h"
 
 void render_box(render::renderer* r, const bbox& bb, const clr4& clr) {
     r->rect(
@@ -76,31 +77,24 @@ void render_name(render::renderer* r, const bbox& bb, const char* name, const cl
     );
 }
 
-bool render_skeleton(render::renderer* r, cs::base_entity* controller, const clr4& clr, bool render, bbox& bb, float padding = 0.f) {
+void render_skeleton(render::renderer* r, cs::base_entity* controller, const clr4& clr) {
     auto game_scene_node = controller->m_pGameSceneNode();
     if (!game_scene_node)
-        return false;
+        return;
 
     auto skeleton = game_scene_node->get_skeleton_instance();
     if (!skeleton)
-        return false;
-
-    // do this first so we don't have to check every bone if the origin is offscreen
-    auto& origin = game_scene_node->m_vecAbsOrigin();
-    auto origin2 = origin + vec3(0, 0, 32);
-    vec2 origin_scr, origin2_scr;
-    if (!math::world_to_screen(origin, origin_scr, false) || !math::world_to_screen(origin2, origin2_scr, false))
-        return false;
+        return;
 
     skeleton->calc_world_space_bones(cs::bone_flags::FLAG_HITBOX);
 
     auto& model_state = skeleton->m_modelState();
     cs::model* model = model_state.m_hModel();
-    const auto num_bones = model->num_bones();
-    auto bones = model_state.get_bone_data();
+    if (!model)
+        return;
 
-    std::vector<vec2> bone_scrs;
-    bone_scrs.reserve(num_bones * 2);
+    const auto num_bones = model->num_bones();
+    auto bone_data = model_state.get_bone_data();
 
     for (uint32_t i = 0; i < num_bones; i++) {
         if (!(model->bone_flags(i) & cs::bone_flags::FLAG_HITBOX)) {
@@ -112,46 +106,15 @@ bool render_skeleton(render::renderer* r, cs::base_entity* controller, const clr
             continue;
 
         vec2 start_scr, end_scr;
-        if (!math::world_to_screen(bones[i].pos, start_scr, false) || !math::world_to_screen(bones[parent_index].pos, end_scr, false))
+        if (!math::world_to_screen(bone_data[i].pos, start_scr, false) || !math::world_to_screen(bone_data[parent_index].pos, end_scr, false))
             continue;
 
-        bone_scrs.push_back(start_scr);
-        bone_scrs.push_back(end_scr);
-
-        if (render) {
-            r->line(
-                start_scr.x, start_scr.y,
-                end_scr.x, end_scr.y,
-                clr, 1
-            );
-        }
+        r->line(
+            start_scr.x, start_scr.y,
+            end_scr.x, end_scr.y,
+            clr, 1
+        );
     }
-
-    bb.x = bb.y = std::numeric_limits<float>::max();
-    bb.w = bb.h = -std::numeric_limits<float>::max();
-
-    if (bone_scrs.empty())
-        return false;
-
-    for (const auto& pos : bone_scrs) {
-        bb.x = std::min(bb.x, pos.x);
-        bb.y = std::min(bb.y, pos.y);
-        bb.w = std::max(bb.w, pos.x);
-        bb.h = std::max(bb.h, pos.y);
-    }
-
-    bb.x = std::floor(bb.x);
-    bb.y = std::floor(bb.y);
-    bb.w = std::floor(bb.w);
-    bb.h = std::floor(bb.h);
-
-    const float scale = std::abs(origin_scr.y - origin2_scr.y) / 32.f;
-    bb.x -= std::floor(scale * padding);
-    bb.y -= std::floor(scale * padding);
-    bb.w += std::floor(scale * padding);
-    bb.h += std::floor(scale * padding);
-
-    return true;
 }
 
 void render_weapon_name(render::renderer* r, const bbox& bb, cs::base_player_weapon* weapon, const clr4& clr, bool bottom = false, float offset = 1.f) {
@@ -191,70 +154,75 @@ void render_player_weapon(render::renderer* r, const bbox& bb, cs::base_player_p
         render_weapon_name(r, bb, weapon, clr, true, offset);
 }
 
-void features::esp::render(render::renderer* r) noexcept {
-    // FIXME: other types of esp
-    if (cfg.esp.players.enabled == false)
+void render_player_esp(render::renderer* r, const entity_cache::cached_entity& cached_entity) {
+    auto controller = cached_entity.get<cs::player_controller>();
+    if (!controller || controller->m_bIsLocalPlayerController() || !controller->m_bPawnIsAlive())
+        return;
+    
+    auto player = controller->m_hPawn().get();
+    if (!player)
+        return;
+    
+    if (cheat::local && !cheat::local->is_enemy(player) && !cfg.esp.players.teammates)
+        return;
+    
+    if (cfg.esp.players.skeleton)
+        render_skeleton(r, player, clr4::white(220)); // TODO: skeleton color config
+
+    if (cfg.esp.players.box)
+        render_box(r, cached_entity.bb, clr4::white(220)); // TODO: box color config
+
+    if (cfg.esp.players.health)
+        render_health(r, cached_entity.bb, std::min(controller->m_iPawnHealth(), 100u));
+
+    if (cfg.esp.players.name) {
+        std::string name(controller->m_sSanitizedPlayerName());
+        if (controller->has_flag(cs::flags::fl_fakeclient))
+            name.insert(0, "BOT ");
+        render_name(r, cached_entity.bb, name.c_str(), clr4::white(220)); // TODO: text color config
+    }
+
+    if (cfg.esp.players.weapon_name || cfg.esp.players.weapon_ammo)
+        render_player_weapon(r, cached_entity.bb, player, clr4::white(220)); // TODO: text color config
+}
+
+void render_weapon_esp(render::renderer* r, const entity_cache::cached_entity& cached_entity) {
+    auto weapon = cached_entity.get<cs::base_player_weapon>();
+    if (!weapon)
+        return;
+    
+    if (weapon->m_iState() != cs::weapon_state::WEAPON_NOT_CARRIED)
         return;
 
+    if (cfg.esp.weapons.box)
+        render_box(r, cached_entity.bb, clr4::white(220)); // TODO: box color config
+
+    if (cfg.esp.weapons.ammo)
+        render_weapon_ammo(r, cached_entity.bb, weapon);
+
+    if (cfg.esp.weapons.name)
+        render_weapon_name(r, cached_entity.bb, weapon, clr4::white(220)); // TODO: text color config
+}
+
+void features::esp::render(render::renderer* r) noexcept {
     if (!interfaces::engine->is_valid())
         return;
 
-    for (uint32_t i = 1; i < cheat::global_vars->max_clients; i++) {
-        auto controller = interfaces::entity_list->get_base_entity<cs::player_controller>(i);
-        if (!controller || controller->m_bIsLocalPlayerController() || !controller->m_bPawnIsAlive())
-            continue;
-        
-        auto player = controller->m_hPawn().get();
-        if (!player)
-            continue;
-        
-        if (cheat::local && !cheat::local->is_enemy(player) && !cfg.esp.players.teammates)
+    std::shared_lock lock(entity_cache::mutex);
+    for (const auto& [index, cached_entity] : entity_cache::entities) {
+        if (!cached_entity.draw)
             continue;
 
-        bbox bb;
-        if (!render_skeleton(r, player, clr4::white(220), cfg.esp.players.skeleton, bb, 8)) // TODO: skeleton color config
-            continue;
-
-        if (cfg.esp.players.box)
-            render_box(r, bb, clr4::white(220)); // TODO: box color config
-
-        if (cfg.esp.players.health)
-            render_health(r, bb, std::min(controller->m_iPawnHealth(), 100u));
-
-        if (cfg.esp.players.name) {
-            std::string name(controller->m_sSanitizedPlayerName());
-            if (controller->has_flag(cs::flags::fl_fakeclient))
-                name.insert(0, "BOT ");
-            render_name(r, bb, name.c_str(), clr4::white(220)); // TODO: text color config
-        }
-
-        if (cfg.esp.players.weapon_name || cfg.esp.players.weapon_ammo)
-            render_player_weapon(r, bb, player, clr4::white(220)); // TODO: text color config
-    }
-
-    for (uint32_t i = cheat::global_vars->max_clients; i <= interfaces::entity_list->get_highest_entity_index(); i++) {
-        auto entity = interfaces::entity_list->get_base_entity(i);
-        if (!entity)
-            continue;
-
-        if (cfg.esp.weapons.enabled && entity->is_base_player_weapon()) {
-            auto weapon = entity->as<cs::base_player_weapon>();
-
-            if (weapon->m_iState() != cs::weapon_state::WEAPON_NOT_CARRIED)
-                continue;
-            
-            bbox bb;
-            if (!weapon->get_bounding_box(bb, true))
-                continue;
-            
-            if (cfg.esp.weapons.box)
-                render_box(r, bb, clr4::white(220)); // TODO: box color config
-            
-            if (cfg.esp.weapons.name)
-                render_weapon_name(r, bb, weapon, clr4::white(220)); // TODO: text color config
-            
-            if (cfg.esp.weapons.ammo)
-                render_weapon_ammo(r, bb, weapon);
+        switch (cached_entity.type)
+        {
+        case entity_cache::entity_type::PLAYER:
+            if (cfg.esp.players.enabled)
+                render_player_esp(r, cached_entity);
+            break;
+        case entity_cache::entity_type::WEAPON:
+            if (cfg.esp.weapons.enabled)
+                render_weapon_esp(r, cached_entity);
+            break;
         }
     }
 

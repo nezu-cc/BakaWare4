@@ -80,6 +80,87 @@ bool cs::base_entity::get_bounding_box(bbox &out, bool hitbox) noexcept {
     return true;
 }
 
+bool cs::base_player_pawn::get_bounding_box(bbox &out, bool bones) noexcept {
+    if (!bones)
+        return cs::base_entity::get_bounding_box(out, false);
+
+    auto game_scene_node = m_pGameSceneNode();
+    if (!game_scene_node)
+        return false;
+
+    auto skeleton = game_scene_node->get_skeleton_instance();
+    if (!skeleton)
+        return false;
+
+    // do this first so we don't have to check every bone if the origin is offscreen
+    constexpr float origin2_offset = 32.f;
+    auto& origin = game_scene_node->m_vecAbsOrigin();
+    auto origin2 = origin + vec3(0, 0, origin2_offset);
+    vec2 origin_scr, origin2_scr;
+    if (!math::world_to_screen(origin, origin_scr, false) || !math::world_to_screen(origin2, origin2_scr, false))
+        return false;
+
+    skeleton->calc_world_space_bones(cs::bone_flags::FLAG_HITBOX);
+
+    auto& model_state = skeleton->m_modelState();
+    cs::model* model = model_state.m_hModel();
+    const auto num_bones = model->num_bones();
+    auto bone_data = model_state.get_bone_data();
+
+    std::vector<vec2> bone_scrs;
+    bone_scrs.reserve(num_bones);
+
+    for (uint32_t i = 0; i < num_bones; i++) {
+        if (!(model->bone_flags(i) & cs::bone_flags::FLAG_HITBOX)) {
+            continue;
+        }
+
+        vec2 start_scr;
+        if (!math::world_to_screen(bone_data[i].pos, start_scr, false))
+            continue;
+        
+        bone_scrs.push_back(start_scr);
+
+        auto parent_index = model->bone_parent(i);
+        if (parent_index == -1)
+            continue;
+
+        // skip parents that are hitboxes because we will find them as part of the loop
+        if (model->bone_flags(parent_index) & cs::bone_flags::FLAG_HITBOX)
+            continue;
+
+        vec2 end_scr;
+        if (!math::world_to_screen(bone_data[parent_index].pos, end_scr, false))
+            continue;
+
+        bone_scrs.push_back(end_scr);
+    }
+
+    out.x = out.y = std::numeric_limits<float>::max();
+    out.w = out.h = -std::numeric_limits<float>::max();
+
+    if (bone_scrs.empty())
+        return false;
+
+    for (const auto& pos : bone_scrs) {
+        out.x = std::min(out.x, pos.x);
+        out.y = std::min(out.y, pos.y);
+        out.w = std::max(out.w, pos.x);
+        out.h = std::max(out.h, pos.y);
+    }
+
+    out.floor();
+
+    const float scale = std::abs(origin_scr.y - origin2_scr.y) / origin2_offset;
+    const float padding = std::floor(scale * 8);
+    out.x -= padding;
+    out.y -= padding;
+    out.w += padding;
+    out.h += padding;
+
+    return true;
+}
+
 cs::entity_instance_by_class_iter::entity_instance_by_class_iter(base_entity* start_entity, const char* name) noexcept {
     entity = start_entity ? start_entity->m_pEntity() : nullptr;
     find_filter = nullptr; // haven't reversed yet, seems to always be null

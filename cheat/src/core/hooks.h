@@ -29,23 +29,8 @@ namespace hooks {
     DECLARE_HOOK(level_init, void, se::client_mode, const char*);
     DECLARE_HOOK(level_shutdown, void, se::client_mode);
     DECLARE_HOOK(on_render_start, void, se::view_render);
-    
-
-    // DECLARE_HOOK(level_init_post_entity, void, se::client_dll)
-    // DECLARE_HOOK(level_shutdown, void, se::client_dll)
-    // DECLARE_HOOK(create_move_proxy, void, se::client_dll, int, float, bool)
-    // DECLARE_HOOK(frame_stage_notify, void, se::client_dll, cs::frame_stage)
-    // DECLARE_HOOK(override_view, void, se::client_mode, cs::view_setup*)
-    // DECLARE_HOOK(get_viewmodel_fov, float, se::client_mode)
-    // DECLARE_HOOK(on_add_entity, void, se::entity_list, cs::handle_entity*, cs::base_handle)
-    // DECLARE_HOOK(on_remove_entity, void, se::entity_list, cs::handle_entity*, cs::base_handle)
-    // DECLARE_HOOK(fire_event_intern, bool, se::event_manager, cs::game_event*, bool, bool)
-    // DECLARE_HOOK(draw_model, void, se::studio_render, cs::draw_model_results*,
-    //     const cs::draw_model_info&, mat3x4*, float*, float*, const vec3&, int)
-    // DECLARE_HOOK(lock_cursor, void, se::surface)
-    // DECLARE_HOOK(paint, void, se::vgui, cs::paint_mode)
-
-    // DECLARE_PROXY(spotted, "CBaseEntity->m_bSpotted")
+    DECLARE_HOOK(on_add_entity, void, se::entity_list, cs::base_entity*, cs::handle<cs::base_entity>);
+    DECLARE_HOOK(on_remove_entity, void, se::entity_list, cs::base_entity*, cs::handle<cs::base_entity>);
 
 }
 

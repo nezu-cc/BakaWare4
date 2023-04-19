@@ -20,7 +20,7 @@ void interfaces::initialize() noexcept
     get_cached_interface(input_stack_system, XOR("InputStackSystemVersion001"));
     get_cached_interface(localize, XOR("Localize_001"));
 
-    entity_list.initialize(game_resource->get_entity_list());
+    entity_list.initialize<true>(game_resource->get_entity_list());
     csgo_input.initialize<true>(se::csgo_input::get());
     client_mode.initialize<true>(se::client_mode::get());
     view_render.initialize<true>(se::view_render::get());

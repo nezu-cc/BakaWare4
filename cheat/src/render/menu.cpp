@@ -1,9 +1,10 @@
 #include "menu.h"
-#include "../core/cheat.h"
 #include <imgui.h>
 #include <imgui_internal.h>
-#include "../core/config.h"
 #include "imgui_extra.h"
+#include "../core/cheat.h"
+#include "../core/config.h"
+#include "../core/entity_cache.h"
 
 #define ADD_VERSION(str) (str " " BAKAWARE_VERSION)
 
@@ -39,6 +40,10 @@ void menu::render() noexcept {
     ImGui::Text(XOR("Local player pawn: %p"), cheat::local.pawn);
     ImGui::Text(XOR("highest_entity_index: %d"), interfaces::entity_list->get_highest_entity_index());
     ImGui::Text(XOR("last_mouse_enabled: %d"), input::last_mouse_enabled ? 1 : 0);
+    {
+        std::shared_lock lock(entity_cache::mutex);
+        ImGui::Text(XOR("entity_cache size: %d"), entity_cache::entities.size());
+    }
 #endif
 
     ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));

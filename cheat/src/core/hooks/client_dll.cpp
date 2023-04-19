@@ -2,6 +2,7 @@
 #include "../../core/input.h"
 #include "../../core/cheat.h"
 #include "../../core/features/features.h"
+#include "../../core/entity_cache.h"
 
 bool __fastcall hooks::mouse_input_enabled::fn(se::csgo_input* rcx) {
     if (input::cursor_unlocked)
@@ -27,4 +28,21 @@ bool __fastcall hooks::create_move::fn(se::csgo_input* cs_input, uint32_t split_
 void __fastcall hooks::on_render_start::fn(se::view_render* rcx) {
     original(rcx);
     math::update_view_matrix();
+    entity_cache::update_bounding_boxes();
+}
+
+// NOTE: yes, this takes a entity_instance, but I'm lazy
+void __fastcall hooks::on_add_entity::fn(se::entity_list* rcx, cs::base_entity* entity, cs::handle<cs::base_entity> handle) {
+    if (entity)
+        entity_cache::on_add_entity(entity, handle);
+
+    original(rcx, entity, handle);
+}
+
+// NOTE: yes, this takes a entity_instance, but I'm lazy
+void __fastcall hooks::on_remove_entity::fn(se::entity_list* rcx, cs::base_entity* entity, cs::handle<cs::base_entity> handle) {
+    if (entity)
+        entity_cache::on_remove_entity(entity, handle);
+
+    original(rcx, entity, handle);
 }
