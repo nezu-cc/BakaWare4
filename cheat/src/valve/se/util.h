@@ -16,11 +16,13 @@ template <class T>
 class strong_handle {
 public:
     operator T*() noexcept {
-        ASSERT(binding);
+        if (!binding)
+            return nullptr;
         return (T*)binding->data;
     }
     T* operator->() noexcept {
-        ASSERT(binding);
+        if (!binding)
+            return nullptr;
         return (T*)binding->data;
     }
 private:

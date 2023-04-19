@@ -104,6 +104,9 @@ bool cs::base_player_pawn::get_bounding_box(bbox &out, bool bones) noexcept {
 
     auto& model_state = skeleton->m_modelState();
     cs::model* model = model_state.m_hModel();
+    if (!model)
+        return false;
+
     const auto num_bones = model->num_bones();
     auto bone_data = model_state.get_bone_data();
 
