@@ -150,7 +150,10 @@ void menu::menu_tab_misc::render() noexcept {
     ImGui::Checkbox(XOR("Bunny hop"), &cfg.misc.bunny_hop);
     ImGui::Checkbox(XOR("Recoil crosshair"), &cfg.misc.reoil_crosshair);
 
-    if (ImGui::Button(XOR("CRASH!"))) {
+    if (ImGui::Button(XOR("CRASH!")))
         *(uint32_t*)nullptr = 0xDEADBEEF;
-    }
+    ImGui::SameLine();
+    ASSERT(!ImGui::Button(XOR("ASSERT!")));
+    ImGui::SameLine();
+    ASSERT_MSG(!ImGui::Button(XOR("ASSERT MSG!")), "This is a manual assert message!");
 }

@@ -1,28 +1,26 @@
 #pragma once
 
 #include <cassert>
-#include "logger.h"
+#include <format>
+#include <string_view>
+#include "../crypt/xorstr.h"
+#include "../base/crash_handler.h"
 
 #ifdef NDEBUG
 [[noreturn]]
 #endif
-static void dbg_fail(std::string_view fn, std::string_view msg = "") noexcept
-{
-#ifdef _DEBUG
-    if (msg.empty())
-        LOG_ERROR(XOR("An error occurred in {}!"), fn);
-    else
-        LOG_ERROR(XOR("{} ({})"), msg, fn);
-    assert(false);
-#else
-    std::abort();
-#endif
+static void dbg_fail(std::string_view fn, std::string_view msg = "") noexcept {
+    std::string message = msg.empty() ? 
+        std::vformat(XOR("An error occurred in {}!"), std::make_format_args(fn)) :
+        std::vformat(XOR("{} ({})"), std::make_format_args(msg, fn));
+    
+    crash_handler::handle_crash(message);
 }
 
-#ifdef __clang__
-#define FUNCTION_NAME __PRETTY_FUNCTION__
+#ifdef _DEBUG
+#define ASSERT(expr) assert(expr);
+#define ASSERT_MSG(expr, msg) assert(((void)msg, expr));
 #else
-#define FUNCTION_NAME __FUNCTION__
+#define ASSERT(expr) do { if (!(expr)) dbg_fail(XOR(__FUNCTION__)); } while (false)
+#define ASSERT_MSG(expr, msg) do { if (!(expr)) dbg_fail(XOR(__FUNCTION__), msg); } while (false)
 #endif
-#define ASSERT(expr) do { if (!(expr)) dbg_fail(XOR(FUNCTION_NAME)); } while (false)
-#define ASSERT_MSG(expr, msg) do { if (!(expr)) dbg_fail(XOR(FUNCTION_NAME), msg); } while (false)

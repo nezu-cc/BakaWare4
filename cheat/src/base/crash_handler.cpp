@@ -1,7 +1,35 @@
 #include "crash_handler.h"
-#include "cheat.h"
+#include <windows.h>
 #include <psapi.h>
-#
+#include <format>
+#include <fstream>
+#include <ctime>
+#include <sstream>
+#include "logger.h"
+
+static uintptr_t cheat_base{ };
+
+void save_crash_log(std::string_view log) noexcept {
+    auto file = std::ofstream(std::vformat(XOR("BakaWare_crash_{}.txt"), std::make_format_args(std::time(nullptr))));
+    file << log;
+}
+
+void copy_crash_log_to_clipboard(std::string_view log) noexcept {
+    if (OpenClipboard(NULL)) {
+        HGLOBAL hg = GlobalAlloc(GMEM_MOVEABLE, log.size() + 1);
+        if (!hg) {
+            CloseClipboard();
+            return;
+        }
+        memcpy(GlobalLock(hg), log.data(), log.size() + 1);
+        GlobalUnlock(hg);
+        EmptyClipboard();
+        SetClipboardData(CF_TEXT, hg);
+        CloseClipboard();
+        GlobalFree(hg);
+    }
+}
+
 LONG CALLBACK veh_handler(EXCEPTION_POINTERS* ExceptionInfo) noexcept {
 	auto exception_code = ExceptionInfo->ExceptionRecord->ExceptionCode;
     auto exception_address = ExceptionInfo->ExceptionRecord->ExceptionAddress;
@@ -39,7 +67,7 @@ LONG CALLBACK veh_handler(EXCEPTION_POINTERS* ExceptionInfo) noexcept {
         else
             str = fmt;
 
-        ss << str << std::endl;
+        ss << str << '\n';
     };
 
     switch (exception_code)
@@ -81,29 +109,29 @@ LONG CALLBACK veh_handler(EXCEPTION_POINTERS* ExceptionInfo) noexcept {
 	MEMORY_BASIC_INFORMATION info = {};
 	if (VirtualQuery(exception_address, &info, sizeof info))
         allocation_Base = info.AllocationBase;
-    else if (cheat::base >= 0x7FFFFFFEFFFF)
-        allocation_Base = (LPVOID)cheat::base;
+    else if (cheat_base >= 0x7FFFFFFEFFFF)
+        allocation_Base = (LPVOID)cheat_base;
 
     CHAR module_name[MAX_PATH] = "";
     if (!GetModuleBaseNameA(GetCurrentProcess(), (HMODULE)allocation_Base, module_name, sizeof(module_name))) {
-        if (!cheat::base)
+        if (!cheat_base)
             sprintf_s(module_name, XOR("Unknown(%p)"), allocation_Base);
-        else if ((uintptr_t)allocation_Base == cheat::base)
+        else if ((uintptr_t)allocation_Base == cheat_base)
             sprintf_s(module_name, XOR("BakaWare4"));
         else {
             //parse header of manual mapped module
-            PIMAGE_DOS_HEADER dos_header = (PIMAGE_DOS_HEADER)cheat::base;
+            PIMAGE_DOS_HEADER dos_header = (PIMAGE_DOS_HEADER)cheat_base;
             if (dos_header->e_magic == 0x5A4D) { //MZ
-                PIMAGE_NT_HEADERS ntHeader = (PIMAGE_NT_HEADERS)(cheat::base + dos_header->e_lfanew);
+                PIMAGE_NT_HEADERS ntHeader = (PIMAGE_NT_HEADERS)(cheat_base + dos_header->e_lfanew);
                 auto image_size = ntHeader->OptionalHeader.SizeOfImage;
-                if ((uintptr_t)exception_address >= cheat::base && (uintptr_t)exception_address <= cheat::base + image_size) {
+                if ((uintptr_t)exception_address >= cheat_base && (uintptr_t)exception_address <= cheat_base + image_size) {
                     sprintf_s(module_name, XOR("BakaWare4"));
                 }
             }
         }
     }
 
-    log(XOR("Cheat base: 0x{}"), (void*)cheat::base);
+    log(XOR("Cheat base: 0x{}"), (void*)cheat_base);
     log(XOR("Crash at: 0x{:016x} ({}+0x{:x})"), (uintptr_t)ExceptionInfo->ContextRecord->Rip, module_name, (uintptr_t)ExceptionInfo->ContextRecord->Rip - (uintptr_t)allocation_Base);
     
     log(XOR("Registers:"));
@@ -124,22 +152,25 @@ LONG CALLBACK veh_handler(EXCEPTION_POINTERS* ExceptionInfo) noexcept {
     log(XOR("R14: 0x{:016x}"), ExceptionInfo->ContextRecord->R14);
     log(XOR("R15: 0x{:016x}"), ExceptionInfo->ContextRecord->R15);
 
-    const auto crash_info = ss.str();
-
-    MessageBoxA(render::game_window, crash_info.c_str(), XOR("BakaWare4 has crashed!"), MB_OK | MB_ICONERROR);
-
-	auto file = std::ofstream(std::vformat(XOR("BakaWare_crash_{}.txt"), std::make_format_args(std::time(nullptr))));
-    file << crash_info;
-    file.close();
+    crash_handler::handle_crash(ss.str());
 
 	return EXCEPTION_CONTINUE_SEARCH;
 }
 
-void crash_handler::initialize() noexcept {
+void crash_handler::initialize(const uintptr_t base) noexcept {
+    cheat_base = base;
     PVOID handle = AddVectoredExceptionHandler(FALSE, veh_handler);
     LOG_INFO(XOR("VEH handler at: {}"), handle);
 }
 
 void crash_handler::end() noexcept {
     RemoveVectoredExceptionHandler(veh_handler);
+}
+
+void crash_handler::handle_crash(std::string_view crash_info) noexcept {
+    // copy to clipboard first in case save_crash_log fails
+    copy_crash_log_to_clipboard(crash_info);
+    save_crash_log(crash_info);
+    MessageBoxA(NULL, crash_info.data(), XOR("BakaWare4 has crashed!"), MB_OK | MB_ICONERROR);
+    std::abort();
 }

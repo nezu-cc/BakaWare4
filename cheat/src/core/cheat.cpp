@@ -1,7 +1,7 @@
 #include "cheat.h"
 #include "../render/menu.h"
 #include "../valve/cs/cs.h"
-#include "crash_handler.h"
+#include "../base/crash_handler.h"
 #include "entity_cache.h"
 
 void cheat::initialize(uintptr_t base) noexcept {
@@ -9,7 +9,7 @@ void cheat::initialize(uintptr_t base) noexcept {
 
     dlls::initialize();
     logger::initialize(XOR("BakaWare"));
-    crash_handler::initialize();
+    crash_handler::initialize(base);
     dlls::add_to_trusted_list(base);
     memory::erase_pe_headers(base);
     interfaces::initialize();
