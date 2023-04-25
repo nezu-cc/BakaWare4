@@ -1,11 +1,11 @@
 #include "entity.h"
 #include "player.h"
-
 #include "../../memory/interfaces.h"
 #include "../../base/math.h"
-
-#include <limits>
 #include "../../core/input.h"
+#include "../../core/cheat.h"
+#include <limits>
+
 
 bool cs::base_entity::get_bounding_box(bbox &out, bool hitbox) noexcept {
     collision_property* collision = m_pCollision();
@@ -189,4 +189,13 @@ cs::weapon_cs_base *cs::base_player_pawn::get_active_weapon() noexcept {
         return nullptr;
     
     return weapon_services->m_hActiveWeapon().get<weapon_cs_base>();
+}
+
+float cs::base_player_weapon::get_next_primary_attack() noexcept {
+    if (!cheat::global_vars)
+        return std::numeric_limits<float>::max();
+
+    const auto tick = m_nNextPrimaryAttackTick().m_Value;
+    const auto ratio = m_flNextPrimaryAttackTickRatio();
+    return (tick + ratio) * cheat::global_vars->interval_per_tick;
 }

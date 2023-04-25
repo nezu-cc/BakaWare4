@@ -235,15 +235,20 @@ class base_player_weapon : public econ_entity {
 public:
     NETVAR(m_iState, "C_BasePlayerWeapon", "m_iState", weapon_state);
     NETVAR(m_iClip1, "C_BasePlayerWeapon", "m_iClip1", int32_t);
+    NETVAR(m_nNextPrimaryAttackTick, "C_BasePlayerWeapon", "m_nNextPrimaryAttackTick", se::game_tick);
+    NETVAR(m_flNextPrimaryAttackTickRatio, "C_BasePlayerWeapon", "m_flNextPrimaryAttackTickRatio", float);
 
     base_player_weapon_v_data* get_v_data() noexcept {
         return m_pVDataBase()->as<base_player_weapon_v_data>();
     }
+
+    float get_next_primary_attack() noexcept;
 };
 
 class weapon_cs_base : public base_player_weapon {
 public:
     NETVAR(m_flRecoilIndex, "C_WeaponCSBase", "m_flRecoilIndex", float);
+    NETVAR(m_flLastClientFireBulletTime, "C_WeaponCSBase", "m_flLastClientFireBulletTime", float);
 };
 
 class base_player_controller : public base_entity {
@@ -273,7 +278,8 @@ public:
 class player_pawn_base : public base_player_pawn {
 public:
     NETVAR(m_iShotsFired, "C_CSPlayerPawnBase", "m_iShotsFired", int32_t);
-    NETVAR(m_iHealth, "C_CSPlayerPawnBase", "m_aimPunchCache", se::util_vector<angle>);
+    NETVAR(m_aimPunchAngle, "C_CSPlayerPawnBase", "m_aimPunchAngle", angle);
+    
 
     VIRTUAL_FUNCTION(get_view_angles, angle*, 156, (this, ang), angle* ang)
     VIRTUAL_FUNCTION(get_aim_punch, angle*, 314, (this, ang, full), angle* ang, bool full)

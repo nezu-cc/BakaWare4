@@ -101,4 +101,8 @@ public:
 	list_elem* elements;
 };
 
+struct game_tick {
+    int32_t m_Value;
+};
+
 }

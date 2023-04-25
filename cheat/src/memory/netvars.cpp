@@ -1,5 +1,8 @@
 #include "netvars.h"
 #include "interfaces.h"
+#include <mutex>
+
+std::mutex netvar_mutex;
 
 using NetvarKeyValueMap_t = std::unordered_map<uint32_t, int16_t>;
 using NetvarTableMap_t = std::unordered_map<uint32_t, NetvarKeyValueMap_t>;
@@ -33,6 +36,8 @@ static bool init_netvars_for_class(NetvarTableMap_t& table_map, const char* clas
 }
 
 uintptr_t netvars::get_offset(const char *class_name, uint32_t class_key, const char *member_name, uint32_t member_key) noexcept {
+    std::scoped_lock(netvar_mutex);
+
     static NetvarTableMap_t table_map;
     const auto& table_map_it = table_map.find(class_key);
     if (table_map_it == table_map.cend()) {

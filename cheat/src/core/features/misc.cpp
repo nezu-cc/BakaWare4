@@ -8,11 +8,7 @@ void render_recoil_crosshair(render::renderer* r) noexcept {
     if (!weapon)
         return;
     
-    auto weapon_data = weapon->get_v_data();
-    if (!weapon_data)
-        return;
-    
-    if (!weapon_data->m_bIsFullAuto())
+    if (weapon->m_flRecoilIndex() <= 1.1f)
         return;
     
     vec3 pos, forward_va;
@@ -31,7 +27,7 @@ void render_recoil_crosshair(render::renderer* r) noexcept {
     vec2 screen;
     math::world_to_screen(pos + forward * 2000.f, screen);
 
-    if (std::abs(screen.y - va_screen.y) <= 1)
+    if (screen.distance_to(va_screen) <= 25)
         return;
 
     const auto [x, y] = screen;
@@ -58,36 +54,40 @@ void run_bunny_hop(se::user_cmd* cmd) noexcept {
 }
 
 void run_rcs(angle* va) noexcept {
-    if (!cheat::local.valid() || !cheat::local.void_move_type())
+    if (!cheat::local.valid() || !cheat::local.void_move_type() || !cheat::global_vars)
         return;
 
     auto weapon = cheat::local->get_active_weapon();
     if (!weapon)
         return;
     
-    auto weapon_data = weapon->get_v_data();
-    if (!weapon_data)
-        return;
-        
-    if (!weapon_data->m_bIsFullAuto())
-        return;
-    
     angle aim_punch;
     cheat::local->get_aim_punch(&aim_punch, true);
 
+    static bool active = false;
     static angle old_aim_punch = aim_punch;
+
+    if (active && aim_punch.length2d_sqr() < .01f)
+        active = false;
+
+    if (!active && cheat::local->m_iShotsFired() > 1) {
+        old_aim_punch = angle{ 0.f, 0.f, 0.f };
+        active = true;
+    }
+
+    if (!active) {
+        old_aim_punch = angle{ 0.f, 0.f, 0.f };
+        return;
+    }
+
     angle delta = aim_punch - old_aim_punch;
     old_aim_punch = aim_punch;
 
-    if (cheat::local->m_iShotsFired() == 0)
-        return;
-    
     delta.x *= cfg.misc.rcs.vertical / 100.f;
     delta.y *= cfg.misc.rcs.horizontal / 100.f;
 
     *va -= delta;
     va->normalize();
-
 }
 
 void features::misc::render(render::renderer* r) noexcept {
