@@ -80,9 +80,8 @@ bool cs::base_entity::get_bounding_box(bbox &out, bool hitbox) noexcept {
     return true;
 }
 
-bool cs::base_player_pawn::get_bounding_box(bbox &out, bool bones) noexcept {
-    if (!bones)
-        return cs::base_entity::get_bounding_box(out, false);
+bool cs::base_player_pawn::get_bounding_box(bbox &out, std::array<std::pair<vec2, vec2>, MAX_STUDIO_BONES>& bone_scrs, int& visible_bones_count) noexcept {
+    visible_bones_count = 0;
 
     auto game_scene_node = m_pGameSceneNode();
     if (!game_scene_node)
@@ -107,51 +106,52 @@ bool cs::base_player_pawn::get_bounding_box(bbox &out, bool bones) noexcept {
     if (!model)
         return false;
 
-    const auto num_bones = model->num_bones();
+    auto num_bones = model->num_bones();
     auto bone_data = model_state.get_bone_data();
 
-    std::vector<vec2> bone_scrs;
-    bone_scrs.reserve(num_bones);
+    if (num_bones > MAX_STUDIO_BONES)
+        num_bones = MAX_STUDIO_BONES;
 
     for (uint32_t i = 0; i < num_bones; i++) {
         if (!(model->bone_flags(i) & cs::bone_flags::FLAG_HITBOX)) {
             continue;
         }
 
-        vec2 start_scr;
-        if (!math::world_to_screen(bone_data[i].pos, start_scr, false))
-            continue;
-        
-        bone_scrs.push_back(start_scr);
-
         auto parent_index = model->bone_parent(i);
         if (parent_index == -1)
             continue;
 
-        // skip parents that are hitboxes because we will find them as part of the loop
-        if (model->bone_flags(parent_index) & cs::bone_flags::FLAG_HITBOX)
+        vec2 start_scr, end_scr;
+        if (
+            !math::world_to_screen(bone_data[i].pos, start_scr, false) ||
+            !math::world_to_screen(bone_data[parent_index].pos, end_scr, false)
+        ) {
             continue;
-
-        vec2 end_scr;
-        if (!math::world_to_screen(bone_data[parent_index].pos, end_scr, false))
-            continue;
-
-        bone_scrs.push_back(end_scr);
+        }
+        
+        bone_scrs[visible_bones_count++] = std::make_pair(start_scr, end_scr);
     }
 
     out.x = out.y = std::numeric_limits<float>::max();
     out.w = out.h = -std::numeric_limits<float>::max();
 
-    if (bone_scrs.empty())
+    if (visible_bones_count == 0)
         return false;
+    
+    for (int i = 0; i < visible_bones_count; i++) {
+        const auto& [start, end] = bone_scrs[i];
 
-    for (const auto& pos : bone_scrs) {
-        out.x = std::min(out.x, pos.x);
-        out.y = std::min(out.y, pos.y);
-        out.w = std::max(out.w, pos.x);
-        out.h = std::max(out.h, pos.y);
+        out.x = std::min(out.x, start.x);
+        out.y = std::min(out.y, start.y);
+        out.w = std::max(out.w, start.x);
+        out.h = std::max(out.h, start.y);
+
+        out.x = std::min(out.x, end.x);
+        out.y = std::min(out.y, end.y);
+        out.w = std::max(out.w, end.x);
+        out.h = std::max(out.h, end.y);
     }
-
+    
     out.floor();
 
     const float scale = std::abs(origin_scr.y - origin2_scr.y) / origin2_offset;

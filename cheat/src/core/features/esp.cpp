@@ -77,38 +77,8 @@ void render_name(render::renderer* r, const bbox& bb, const char* name, const cl
     );
 }
 
-void render_skeleton(render::renderer* r, cs::base_entity* controller, const clr4& clr) {
-    auto game_scene_node = controller->m_pGameSceneNode();
-    if (!game_scene_node)
-        return;
-
-    auto skeleton = game_scene_node->get_skeleton_instance();
-    if (!skeleton)
-        return;
-
-    skeleton->calc_world_space_bones(cs::bone_flags::FLAG_HITBOX);
-
-    auto& model_state = skeleton->m_modelState();
-    cs::model* model = model_state.m_hModel();
-    if (!model)
-        return;
-
-    const auto num_bones = model->num_bones();
-    auto bone_data = model_state.get_bone_data();
-
-    for (uint32_t i = 0; i < num_bones; i++) {
-        if (!(model->bone_flags(i) & cs::bone_flags::FLAG_HITBOX)) {
-            continue;
-        }
-
-        auto parent_index = model->bone_parent(i);
-        if (parent_index == -1)
-            continue;
-
-        vec2 start_scr, end_scr;
-        if (!math::world_to_screen(bone_data[i].pos, start_scr, false) || !math::world_to_screen(bone_data[parent_index].pos, end_scr, false))
-            continue;
-
+void render_skeleton(render::renderer* r, const entity_cache::cached_entity& cached_entity, const clr4& clr) {
+    for (const auto& [start_scr, end_scr] : cached_entity.get_scr_bones()) {
         r->line(
             start_scr.x, start_scr.y,
             end_scr.x, end_scr.y,
@@ -167,7 +137,7 @@ void render_player_esp(render::renderer* r, const entity_cache::cached_entity& c
         return;
     
     if (cfg.esp.players.skeleton)
-        render_skeleton(r, player, clr4::white(220)); // TODO: skeleton color config
+        render_skeleton(r, cached_entity, clr4::white(220)); // TODO: skeleton color config
 
     if (cfg.esp.players.box)
         render_box(r, cached_entity.bb, clr4::white(220)); // TODO: box color config

@@ -3,6 +3,7 @@
 #include <shared_mutex>
 #include "../base/base.h"
 #include "../valve/cs/entity.h"
+#include <span>
 
 namespace entity_cache {
 
@@ -19,11 +20,13 @@ class cached_entity {
 public:
     cs::handle<cs::base_entity> handle;
     entity_type type;
-    bbox bb;
-    bool draw;
+    bbox bb{ };
+    std::array<std::pair<vec2, vec2>, MAX_STUDIO_BONES> scr_bones{ };
+    int visible_bone_count{ };
+    bool draw{ };
 
     cached_entity(cs::handle<cs::base_entity> handle, entity_type type) noexcept
-        : handle(handle), type(type), bb(), draw(false) {}
+        : handle(handle), type(type) {}
     
     cached_entity(const cached_entity&) = delete;
     cached_entity(cached_entity&&) = default;
@@ -32,6 +35,10 @@ public:
     template <typename T> requires std::derived_from<T, cs::base_entity>
     std::add_pointer_t<T> get() const noexcept {
         return handle.get<T>();
+    }
+
+    inline auto get_scr_bones() const noexcept {
+        return std::span(scr_bones).first(visible_bone_count);
     }
 };
 

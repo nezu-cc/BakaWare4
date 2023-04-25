@@ -61,7 +61,7 @@ void entity_cache::update_bounding_boxes() noexcept {
             if (!player)
                 continue;
 
-            cached_entity.draw = player->get_bounding_box(cached_entity.bb, true);
+            cached_entity.draw = player->get_bounding_box(cached_entity.bb, cached_entity.scr_bones, cached_entity.visible_bone_count);
             break;
         }
         case entity_cache::entity_type::WEAPON: {

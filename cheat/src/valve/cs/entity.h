@@ -265,7 +265,7 @@ public:
     NETVAR(m_hController, "C_BasePlayerPawn", "m_hController", handle<base_player_controller>);
     NETVAR(m_pWeaponServices, "C_BasePlayerPawn", "m_pWeaponServices", player_weapon_services*);
 
-    bool get_bounding_box(bbox &out, bool bones = false) noexcept;
+    bool get_bounding_box(bbox &out, std::array<std::pair<vec2, vec2>, MAX_STUDIO_BONES>& bone_scrs, int& visible_bones_count) noexcept;
 
     weapon_cs_base *get_active_weapon() noexcept;
 };
