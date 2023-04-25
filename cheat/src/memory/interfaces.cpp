@@ -7,12 +7,14 @@ static void get_cached_interface(interface_holder<ty*>& ptr, std::string_view ve
 
 void interfaces::initialize() noexcept
 {
+    collect_interfaces(dlls::tier0);
     collect_interfaces(dlls::client);
     collect_interfaces(dlls::engine2);
     collect_interfaces(dlls::schemasystem);
     collect_interfaces(dlls::input_system);
     collect_interfaces(dlls::localize);
 
+    get_cached_interface(cvar, XOR("VEngineCvar007"));
     get_cached_interface(client, XOR("Source2Client002"));
     get_cached_interface(engine, XOR("Source2EngineToClient001"));
     get_cached_interface(game_resource, XOR("GameResourceServiceClientV001"));

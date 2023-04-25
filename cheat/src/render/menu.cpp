@@ -17,6 +17,10 @@ void menu::render() noexcept {
 
     if (ImGui::Button(XOR("Unhook")))
         cheat::should_unhook = true;
+    
+    if (ImGui::Button(XOR("Unlock all cvars"))) {
+        interfaces::cvar->unlock_all();
+    }
 
     ImGui::SeparatorText(XOR("Debug config"));
 

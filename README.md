@@ -20,6 +20,7 @@ Counter-Strike 2 cheat
   - bunnyhop
   - recoil crosshair
   - RCS
+  - Unlock all cvars (**Debug build only!**)
 
 **THIS CHEAT IS STILL WIP, MORE TO COME SOON:tm:**
 

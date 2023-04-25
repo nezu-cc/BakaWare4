@@ -61,6 +61,7 @@ inline interface_holder<se::input_stack_system*>    input_stack_system{ };
 inline interface_holder<se::client_mode*>           client_mode{ };
 inline interface_holder<se::localize*>              localize{ };
 inline interface_holder<se::view_render*>           view_render{ };
+inline interface_holder<se::cvar*>                  cvar{ };
 
 void initialize() noexcept;
 

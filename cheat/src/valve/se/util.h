@@ -43,6 +43,9 @@ public:
     T* memory;
     int allocation_count;
     int grow_size;
+
+    T& operator[](int i) noexcept { return memory[i]; }
+    const T& operator[](int i) const noexcept { return memory[i]; }
 };
 
 class util_string {
@@ -70,5 +73,32 @@ public:
 };
 
 static_assert(sizeof(util_vector<void*>) == 0x18);
+
+#define INVALID_LLIST_IDX ((I)~0)
+
+template <class T, class I = int> 
+class utl_linked_list {
+public:
+    inline I first() const noexcept { return head; }
+    inline I previous( I i ) const noexcept { return memory[i].previous; }
+    inline I next( I i ) const noexcept { return memory[i].next; }
+    inline T& element( I i ) noexcept { return memory[i].element; }
+    inline const T& element( I i ) const noexcept { return memory[i].element; }
+    inline static I invalid_index() noexcept { return INVALID_LLIST_IDX; }
+
+    struct alignas(8) list_elem {
+		T element;
+		I previous;
+		I next;
+	};
+
+    utl_memory<list_elem> memory;
+    I head;
+	I tail;
+	I first_free;
+	I element_count;
+	I total_elements;
+	list_elem* elements;
+};
 
 }
