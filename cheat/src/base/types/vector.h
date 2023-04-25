@@ -12,6 +12,152 @@ struct vec2 {
         : x(v.x), y(v.y) { }
     constexpr vec2(d2 v) noexcept
         : x(v.x), y(v.y) { }
+    
+    bool operator==(const vec2& rhs) const noexcept
+    {
+        return (std::abs(x - rhs.x) <= std::numeric_limits<float>::epsilon() &&
+            std::abs(y - rhs.y) <= std::numeric_limits<float>::epsilon());
+    }
+
+    bool operator!=(const vec2& rhs) const noexcept
+    {
+        return (std::abs(x - rhs.x) > std::numeric_limits<float>::epsilon() ||
+            std::abs(y - rhs.y) > std::numeric_limits<float>::epsilon());
+    }
+
+    constexpr vec2 operator+(const vec2& rhs) const noexcept
+    {
+        return vec2(x + rhs.x, y + rhs.y);
+    }
+
+    constexpr vec2 operator-(const vec2& rhs) const noexcept
+    {
+        return vec2(x - rhs.x, y - rhs.y);
+    }
+
+    constexpr vec2 operator*(const vec2& rhs) const noexcept
+    {
+        return vec2(x * rhs.x, y * rhs.y);
+    }
+
+    constexpr vec2 operator/(const vec2& rhs) const noexcept
+    {
+        return vec2(x / rhs.x, y / rhs.y);
+    }
+
+    constexpr vec2 operator+(const float rhs) const noexcept
+    {
+        return vec2(x + rhs, y + rhs);
+    }
+
+    constexpr vec2 operator-(const float rhs) const noexcept
+    {
+        return vec2(x - rhs, y - rhs);
+    }
+
+    constexpr vec2 operator*(const float rhs) const noexcept
+    {
+        return vec2(x * rhs, y * rhs);
+    }
+
+    constexpr vec2 operator/(const float rhs) const noexcept
+    {
+        return vec2(x / rhs, y / rhs);
+    }
+
+    constexpr vec2& operator=(const vec2& rhs) noexcept
+    {
+        x = rhs.x;
+        y = rhs.y;
+        return *this;
+    }
+
+    constexpr vec2& operator+=(const vec2& rhs) noexcept
+    {
+        x += rhs.x;
+        y += rhs.y;
+        return *this;
+    }
+
+    constexpr vec2& operator-=(const vec2& rhs) noexcept
+    {
+        x -= rhs.x;
+        y -= rhs.y;
+        return *this;
+    }
+
+    constexpr vec2& operator/=(const vec2& rhs) noexcept
+    {
+        x /= rhs.x;
+        y /= rhs.y;
+        return *this;
+    }
+
+    constexpr vec2& operator+=(const float rhs) noexcept
+    {
+        x += rhs;
+        y += rhs;
+        return *this;
+    }
+
+    constexpr vec2& operator-=(const float rhs) noexcept
+    {
+        x -= rhs;
+        y -= rhs;
+        return *this;
+    }
+
+    constexpr vec2& operator*=(const float rhs) noexcept
+    {
+        x *= rhs;
+        y *= rhs;
+        return *this;
+    }
+
+    constexpr vec2& operator/=(const float rhs) noexcept
+    {
+        x /= rhs;
+        y /= rhs;
+        return *this;
+    }
+
+    constexpr void inverse() noexcept
+    {
+        x = -x;
+        y = -y;
+    }
+
+    constexpr void clear() noexcept
+    {
+        x = { };
+        y = { };
+    }
+
+    float length_sqr() const noexcept
+    {
+        return dot_product(*this);
+    }
+
+    float length() const noexcept
+    {
+        return sqrtf(length_sqr());
+    }
+
+    float distance_to(const vec2& other) const noexcept
+    {
+        return (*this - other).length();
+    }
+
+    float dot_product(const vec2& v) const noexcept
+    {
+        return (x * v.x + y * v.y);
+    }
+
+    float dot_product_abs(const vec2& v) const noexcept
+    {
+        return (std::abs(x * v.x) + std::abs(y * v.y));
+    }
+
 };
 
 struct vec3 {
