@@ -4,6 +4,17 @@ void render_recoil_crosshair(render::renderer* r) noexcept {
     if (!cheat::local.valid())
         return;
     
+    auto weapon = cheat::local->get_active_weapon();
+    if (!weapon)
+        return;
+    
+    auto weapon_data = weapon->get_v_data();
+    if (!weapon_data)
+        return;
+    
+    if (!weapon_data->m_bIsFullAuto())
+        return;
+    
     vec3 pos, forward_va;
     cheat::local->get_pos(&pos, &forward_va, nullptr, nullptr);
 
@@ -42,8 +53,9 @@ void run_bunny_hop(se::user_cmd* cmd) noexcept {
     if (!cheat::local.valid() || !cheat::local.void_move_type())
         return;
     
-    if (!cheat::local->has_flag(cs::flags::fl_onground))
-        cmd->buttons &= ~se::buttons::in_jump;
+    // if (!cheat::local->has_flag(cs::flags::fl_onground))
+    //     cmd->buttons &= ~se::buttons::in_jump;
+}
 
 void run_rcs(angle* va) noexcept {
     if (!cheat::local.valid() || !cheat::local.void_move_type())
