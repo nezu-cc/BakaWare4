@@ -8,7 +8,6 @@ void debug_overlay::render() noexcept {
     if (sections.empty())
         return;
     
-    ImGui::SetNextWindowSize(ImVec2(500, 500), ImGuiCond_FirstUseEver);
     if (ImGui::Begin(XOR("Debug Overlay"))){
         for (auto &[name, section] : sections) {
             if (section.log.empty())

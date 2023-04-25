@@ -241,6 +241,11 @@ public:
     }
 };
 
+class weapon_cs_base : public base_player_weapon {
+public:
+    NETVAR(m_flRecoilIndex, "C_WeaponCSBase", "m_flRecoilIndex", float);
+};
+
 class base_player_controller : public base_entity {
 public:
     NETVAR(m_steamID, "CBasePlayerController", "m_steamID", uint64_t);
@@ -262,11 +267,12 @@ public:
 
     bool get_bounding_box(bbox &out, bool bones = false) noexcept;
 
-    base_player_weapon *get_active_weapon() noexcept;
+    weapon_cs_base *get_active_weapon() noexcept;
 };
 
 class player_pawn_base : public base_player_pawn {
 public:
+    NETVAR(m_iShotsFired, "C_CSPlayerPawnBase", "m_iShotsFired", int32_t);
     NETVAR(m_iHealth, "C_CSPlayerPawnBase", "m_aimPunchCache", se::util_vector<angle>);
 
     VIRTUAL_FUNCTION(get_view_angles, angle*, 156, (this, ang), angle* ang)

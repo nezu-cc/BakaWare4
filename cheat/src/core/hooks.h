@@ -25,6 +25,7 @@ namespace hooks {
     DECLARE_HOOK(present, HRESULT, IDXGISwapChain, UINT, UINT);
     DECLARE_HOOK(resize_buffers, HRESULT, IDXGISwapChain, UINT, UINT, UINT, DXGI_FORMAT, UINT);
     DECLARE_HOOK(mouse_input_enabled, bool, se::csgo_input);
+    DECLARE_HOOK(on_input, void, se::csgo_input, uint32_t, angle*, se::move_input*, void*, float)
     DECLARE_HOOK(create_move, bool, se::csgo_input, uint32_t, uint8_t);
     DECLARE_HOOK(level_init, void, se::client_mode, const char*);
     DECLARE_HOOK(level_shutdown, void, se::client_mode);

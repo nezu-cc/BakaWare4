@@ -19,6 +19,7 @@ Counter-Strike 2 cheat
 - Misc
   - bunnyhop
   - recoil crosshair
+  - RCS
 
 **THIS CHEAT IS STILL WIP, MORE TO COME SOON:tm:**
 

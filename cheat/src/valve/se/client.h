@@ -44,37 +44,101 @@ private:
 };
 
 struct cmd_qangle {
-    char pad1[0x18];
-    vec3 angles;
+    PAD(0x18)
+    angle angles;
 };
 
 static_assert(sizeof(cmd_qangle) == 0x24);
 
-struct user_cmd_base {
-    PAD(0x40)
+class csgo_input_history_entry_pb {
+public:
+    PAD(0x18)
     cmd_qangle* view;
-    PAD(0x8)
-    float forwardmove;
-    float sidemove;
+};
+static_assert(sizeof(csgo_input_history_entry_pb) == 0x20);
+
+class sub_tick_container {
+public:
+    std::int32_t tick_count;
+    PAD(0x4)
+    std::uint8_t* tick_pointer;
+
+    csgo_input_history_entry_pb* get_history_entry(int32_t index) {
+        if (index < this->tick_count)
+        {
+            csgo_input_history_entry_pb** tick_list = reinterpret_cast<csgo_input_history_entry_pb**>(this->tick_pointer + 0x8);
+            return tick_list[index];
+        }
+
+        return nullptr;
+    }
+};
+
+static_assert(sizeof(sub_tick_container) == 0x10);
+
+struct user_cmd_base {
+    PAD(0x40) // 0x0
+    cmd_qangle* view; // 0x40
+    int command_number; // 0x48
+    int tick_count; // 0x4C
+    float forwardmove; // 0x50
+    float leftmove; // 0x54
+    float upmove; // 0x58
 
     // TODO: maybe more here
 };
 
+struct in_button_state {
+    PAD(sizeof(void*)) // 0x0 (vtable)
+    uint64_t buttons1; // 0x8
+    uint64_t buttons2; // 0x10
+    uint64_t buttons3; // 0x18
+};
+
 struct user_cmd {
-    PAD(0x30)
-    user_cmd_base* base;
-    PAD(0x18)
-    uint32_t buttons;
-    PAD(0x1C)
+    PAD(0x20) // 0x0
+    sub_tick_container sub_tick_container; // 0x20
+    user_cmd_base* base; // 0x30
+    PAD(0x10) // 0x38
+    in_button_state button_state; // 0x48
+    PAD(0x8) // 0x68
 };
 
 static_assert(sizeof(user_cmd) == 0x70);
 
+struct subtick_move_step {
+    uint64_t button;
+    bool pressed;
+    float when;
+};
+
+static_assert(sizeof(subtick_move_step) == 0x10);
+
+// FIXME: bad name, idk how to call it
+struct move_input {
+    float forwardmove;
+    float leftmove;
+    float upmove;
+};
+
 struct per_user_input {
-    user_cmd cmds[150];
-    PAD(0x30)
-    int sequence_number;
-    PAD(0x18C)
+    user_cmd cmds[150]; // 0x0
+    PAD(0x30) // 0x41A0
+    int sequence_number; // 0x41D0
+    PAD(0x4) // 0x41D4
+    uint64_t button_state1; // 0x41D8 (is held in this tick)
+    uint64_t button_state2; // 0x41E0 (has been pressed down in this tick)
+    uint64_t button_state3; // 0x41E8 (has been released in this tick)
+    uint64_t button_state4; // 0x41F0 (was held down in previous tick)
+    PAD(0x80) // 0x41F8
+    move_input move; // 0x4278
+    angle viewangles; // 0x4284
+    int16_t mousedx; // 0x4290
+    PAD(0x2) // 0x4292
+    int16_t mousedy; // 0x4294
+    PAD(0x2) // 0x4296
+    int subtick_count; // 0x4298
+    subtick_move_step subticks[12]; // 0x429C
 };
 
 static_assert(sizeof(per_user_input) == sizeof(user_cmd) * (150 + 4)); // 0x4360
@@ -86,11 +150,17 @@ struct csgo_input {
 
     VIRTUAL_FUNCTION_SIG(set_cursor_pos, void, dlls::client, "44 89 44 24 18 89 54 24 10 48 83", (this, x, y), uint32_t x, uint32_t y)
 
-    user_cmd* get_user_cmd(int split_screen_index) {
+    per_user_input* get_per_user_input(int split_screen_index) {
         if (split_screen_index >= MAX_SPLITSCREEN_PLAYERS) {
             return nullptr;
         }
-        auto input = &per_user[split_screen_index];
+        return &per_user[split_screen_index];
+    }
+
+    user_cmd* get_user_cmd(int split_screen_index) {
+        auto input = get_per_user_input(split_screen_index);
+        if (!input)
+            return nullptr;
         return &input->cmds[input->sequence_number % std::size(input->cmds)];
     }
 private:

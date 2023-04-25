@@ -17,7 +17,8 @@ namespace features {
 
     namespace misc {
         void render(render::renderer* r) noexcept;
-        void run(se::user_cmd* cmd) noexcept;
+        void create_move(se::user_cmd* cmd) noexcept;
+        void input(angle* va, se::move_input* input, float frame_time) noexcept;
     }
 
     inline void render(render::renderer* r) noexcept {
@@ -25,8 +26,12 @@ namespace features {
         misc::render(r);
     }
 
-    inline void run(se::user_cmd* cmd) noexcept {
-        misc::run(cmd);
+    inline void create_move(se::user_cmd* cmd) noexcept {
+        misc::create_move(cmd);
+    }
+
+    inline void input(angle* va, se::move_input* input, float frame_time) noexcept {
+        misc::input(va, input, frame_time);
     }
 
 }

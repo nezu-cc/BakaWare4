@@ -149,6 +149,9 @@ void menu::menu_tab_visuals::render() noexcept {
 void menu::menu_tab_misc::render() noexcept {
     ImGui::Checkbox(XOR("Bunny hop"), &cfg.misc.bunny_hop);
     ImGui::Checkbox(XOR("Recoil crosshair"), &cfg.misc.reoil_crosshair);
+    ImGui::Checkbox(XOR("RCS enable"), &cfg.misc.rcs.enabled);
+    ImGui::Text(XOR("Strength (horizontal/vertical)"));
+    ImGui::SliderFloat2(XOR("##RCSStrength"), cfg.misc.rcs.axis, 0.0f, 100.0f, "%.1f%");
 
     if (ImGui::Button(XOR("CRASH!")))
         *(uint32_t*)nullptr = 0xDEADBEEF;

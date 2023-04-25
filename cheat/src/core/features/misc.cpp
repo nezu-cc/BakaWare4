@@ -44,6 +44,38 @@ void run_bunny_hop(se::user_cmd* cmd) noexcept {
     
     if (!cheat::local->has_flag(cs::flags::fl_onground))
         cmd->buttons &= ~se::buttons::in_jump;
+
+void run_rcs(angle* va) noexcept {
+    if (!cheat::local.valid() || !cheat::local.void_move_type())
+        return;
+
+    auto weapon = cheat::local->get_active_weapon();
+    if (!weapon)
+        return;
+    
+    auto weapon_data = weapon->get_v_data();
+    if (!weapon_data)
+        return;
+        
+    if (!weapon_data->m_bIsFullAuto())
+        return;
+    
+    angle aim_punch;
+    cheat::local->get_aim_punch(&aim_punch, true);
+
+    static angle old_aim_punch = aim_punch;
+    angle delta = aim_punch - old_aim_punch;
+    old_aim_punch = aim_punch;
+
+    if (cheat::local->m_iShotsFired() == 0)
+        return;
+    
+    delta.x *= cfg.misc.rcs.vertical / 100.f;
+    delta.y *= cfg.misc.rcs.horizontal / 100.f;
+
+    *va -= delta;
+    va->normalize();
+
 }
 
 void features::misc::render(render::renderer* r) noexcept {
@@ -54,7 +86,12 @@ void features::misc::render(render::renderer* r) noexcept {
         render_recoil_crosshair(r);
 }
 
-void features::misc::run(se::user_cmd *cmd) noexcept {
+void features::misc::create_move(se::user_cmd *cmd) noexcept {
     if (cfg.misc.bunny_hop)
         run_bunny_hop(cmd);
+}
+
+void features::misc::input(angle *va, se::move_input *input, float frame_time) noexcept {
+    if (cfg.misc.rcs.enabled)
+        run_rcs(va);
 }

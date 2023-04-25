@@ -45,13 +45,31 @@ public:
     )
 };
 
+class rcs_config {
+public:
+    bool enabled{ true };
+    // bool standalone{ false };
+    union {
+        struct {
+            float horizontal;
+            float vertical;
+        };
+        float axis[2] = { 100.0f, 100.0f };
+    };
+
+    NLOHMANN_DEFINE_TYPE_INTRUSIVE_WITH_DEFAULT(
+        rcs_config, enabled, horizontal, vertical
+    )
+};
+
 class misc_config {
 public:
     bool reoil_crosshair { true };
+    rcs_config rcs { }; // TODO: move to legit bot
     bool bunny_hop { false };
 
     NLOHMANN_DEFINE_TYPE_INTRUSIVE_WITH_DEFAULT(
-        misc_config, reoil_crosshair, bunny_hop
+        misc_config, reoil_crosshair, rcs, bunny_hop
     )
 };
 

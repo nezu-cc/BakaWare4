@@ -11,6 +11,12 @@ bool __fastcall hooks::mouse_input_enabled::fn(se::csgo_input* rcx) {
     return original(rcx);
 }
 
+void __fastcall hooks::on_input::fn(se::csgo_input* rcx, uint32_t split_screen_index, angle* viewangles, se::move_input* move, void* unk1, float frame_time) {
+    original(rcx, split_screen_index, viewangles, move, unk1, frame_time);
+
+    features::input(viewangles, move, frame_time);
+}
+
 bool __fastcall hooks::create_move::fn(se::csgo_input* cs_input, uint32_t split_screen_index, uint8_t a3) {
     bool ret = original(cs_input, split_screen_index, a3);
 
@@ -20,7 +26,7 @@ bool __fastcall hooks::create_move::fn(se::csgo_input* cs_input, uint32_t split_
     if (!user_cmd)
         return ret;
 
-    features::run(user_cmd);
+    features::create_move(user_cmd);
 
     return ret;
 }

@@ -183,10 +183,10 @@ cs::base_entity *cs::internal::get_entity_by_index(int index) noexcept {
     return interfaces::entity_list->get_base_entity(index);
 }
 
-cs::base_player_weapon *cs::base_player_pawn::get_active_weapon() noexcept {
+cs::weapon_cs_base *cs::base_player_pawn::get_active_weapon() noexcept {
     auto weapon_services = m_pWeaponServices();
     if (!weapon_services)
         return nullptr;
     
-    return weapon_services->m_hActiveWeapon().get();
+    return weapon_services->m_hActiveWeapon().get<weapon_cs_base>();
 }
