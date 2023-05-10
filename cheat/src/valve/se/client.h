@@ -43,30 +43,66 @@ private:
     VIRTUAL_FUNCTION_SIG_ABSOLUTE(get_max_entities, int, dlls::client, "33 DB E8 ? ? ? ? 8B 08", 3, (this, max), int32_t* max)
 };
 
-struct cmd_qangle {
-    PAD(0x18)
-    angle angles;
+class pb_base {
+private:
+    PAD(0x18) // 0x0
+};
+
+class cmd_qangle : public pb_base {
+public:
+    angle angles; // 0x18
 };
 
 static_assert(sizeof(cmd_qangle) == 0x24);
 
-class csgo_input_history_entry_pb {
+class cmd_vector : public pb_base {
 public:
-    PAD(0x18)
-    cmd_qangle* view;
+    vec3 vector; // 0x18
+    float w; // 0x24
 };
-static_assert(sizeof(csgo_input_history_entry_pb) == 0x20);
+
+static_assert(sizeof(cmd_vector) == 0x28);
+
+class csgo_interpolation_info : public pb_base {
+public:
+    float frac; // 0x18
+    int src_tick; // 0x1C
+    int dst_tick; // 0x20
+};
+
+static_assert(sizeof(csgo_interpolation_info) == 0x24);
+
+class csgo_input_history_entry : public pb_base {
+public:
+    cmd_qangle* view_angles; // 0x18
+    cmd_vector* shoot_position; // 0x20
+    cmd_vector* target_head_pos_check; // 0x28
+    cmd_vector* target_abs_pos_check; // 0x30
+    cmd_qangle* target_abs_ang_check; // 0x38
+    csgo_interpolation_info* cl_interp; // 0x40
+    csgo_interpolation_info* sv_interp0; // 0x48
+    csgo_interpolation_info* sv_interp1; // 0x50 
+    csgo_interpolation_info* player_interp; // 0x58
+    int render_tick_count; // 0x60
+    float render_tick_fraction; // 0x64
+    int player_tick_count; // 0x68
+    float player_tick_fraction; // 0x6C
+    int frame_number; // 0x70
+    int target_ent_index; // 0x74
+};
+
+static_assert(sizeof(csgo_input_history_entry) == 0x78);
 
 class sub_tick_container {
 public:
-    std::int32_t tick_count;
-    PAD(0x4)
-    std::uint8_t* tick_pointer;
+    std::int32_t tick_count; // 0x0
+    PAD(0x4) // 0x4
+    std::uint8_t* tick_pointer; // 0x8
 
-    csgo_input_history_entry_pb* get_history_entry(int32_t index) {
+    csgo_input_history_entry* get_history_entry(int32_t index) {
         if (index < this->tick_count)
         {
-            csgo_input_history_entry_pb** tick_list = reinterpret_cast<csgo_input_history_entry_pb**>(this->tick_pointer + 0x8);
+            csgo_input_history_entry** tick_list = reinterpret_cast<csgo_input_history_entry**>(this->tick_pointer + 0x8);
             return tick_list[index];
         }
 
@@ -76,7 +112,8 @@ public:
 
 static_assert(sizeof(sub_tick_container) == 0x10);
 
-struct user_cmd_base {
+class user_cmd_base {
+public:
     PAD(0x40) // 0x0
     cmd_qangle* view; // 0x40
     int command_number; // 0x48
@@ -99,7 +136,10 @@ struct user_cmd {
     PAD(0x20) // 0x0
     sub_tick_container sub_tick_container; // 0x20
     user_cmd_base* base; // 0x30
-    PAD(0x10) // 0x38
+    int attack3_start_history_index; // 0x38 (release attack1)
+    int attack1_start_history_index; // 0x3C (press attack1)
+    int attack2_start_history_index; // 0x40 (press attack2)
+    PAD(0x4) // 0x44
     in_button_state button_state; // 0x48
     PAD(0x8) // 0x68
 };
@@ -164,8 +204,8 @@ struct csgo_input {
         return &input->cmds[input->sequence_number % std::size(input->cmds)];
     }
 private:
-    PAD(0x10);
-    per_user_input per_user[MAX_SPLITSCREEN_PLAYERS];
+    PAD(0x10); // 0x0
+    per_user_input per_user[MAX_SPLITSCREEN_PLAYERS]; // 0x10
 };
 
 struct client_mode {
@@ -176,21 +216,21 @@ struct client_mode {
 
 struct global_vars {
 public:
-    float realtime;
-    std::int32_t frame_count;
-    PAD(0x8)
-    std::uint32_t max_clients;
-    float interval_per_tick;
-    PAD(0x12)
-    float curtime;
-    float curtime2;
-    PAD(0xC)
-    std::int32_t tick_count;
-    float interval_per_tick2;
-    void* current_netchan;
-    PAD(0x130)
-    char* current_map;
-    char* current_mapname;
+    float realtime; // 0x0
+    std::int32_t frame_count; // 0x4
+    PAD(0x8) // 0x8
+    std::uint32_t max_clients; // 0x10
+    float interval_per_tick; // 0x14
+    PAD(0x14) // 0x18
+    float curtime; // 0x2C
+    float curtime2; // 0x30
+    PAD(0xC) // 0x34
+    std::int32_t tick_count; // 0x40
+    float interval_per_tick2; // 0x44
+    void* current_netchan; // 0x48
+    PAD(0x130) // 0x50
+    char* current_map; // 0x180
+    char* current_mapname; // 0x188
 };
 
 struct view_render {

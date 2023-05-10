@@ -111,7 +111,7 @@ enum class weapon_state : uint32_t {
 	WEAPON_IS_ACTIVE = 0x2,
 };
 
-template <typename T>
+template <typename T = base_entity>
 class handle {
 public:
     uintptr_t m_Index;
@@ -162,6 +162,7 @@ public:
 class game_scene_node {
 public:
     NETVAR(m_nodeToWorld, "CGameSceneNode", "m_nodeToWorld", se::transform);
+    NETVAR(m_vecOrigin, "CGameSceneNode", "m_vecOrigin", vec3); // this is actually CNetworkOriginCellCoordQuantizedVector
     NETVAR(m_vecAbsOrigin, "CGameSceneNode", "m_vecAbsOrigin", vec3);
 
     VIRTUAL_FUNCTION(get_skeleton_instance, skeleton_instance*, 8, (this))
@@ -206,6 +207,7 @@ public:
         return (T*)this;
     }
 
+    NETVAR(m_flSimulationTime, "C_BaseEntity", "m_flSimulationTime", float);
     NETVAR(m_pGameSceneNode, "C_BaseEntity", "m_pGameSceneNode", game_scene_node*);
     NETVAR(m_pCollision, "C_BaseEntity", "m_pCollision", collision_property*);
     NETVAR(m_iTeamNum, "C_BaseEntity", "m_iTeamNum", uint8_t);
@@ -249,6 +251,10 @@ class weapon_cs_base : public base_player_weapon {
 public:
     NETVAR(m_flRecoilIndex, "C_WeaponCSBase", "m_flRecoilIndex", float);
     NETVAR(m_flLastClientFireBulletTime, "C_WeaponCSBase", "m_flLastClientFireBulletTime", float);
+
+    weapon_cs_base_v_data* get_v_data() noexcept {
+        return m_pVDataBase()->as<weapon_cs_base_v_data>();
+    }
 };
 
 class base_player_controller : public base_entity {
@@ -265,7 +271,19 @@ public:
     NETVAR(m_bPawnIsAlive, "CCSPlayerController", "m_bPawnIsAlive", bool);
 };
 
-class base_player_pawn : public base_entity {
+class base_model_entity : public base_entity {
+public:
+    NETVAR(m_vecViewOffset, "C_BaseModelEntity", "m_vecViewOffset", vec3); // this is actually CNetworkViewOffsetVector
+
+    vec3 get_eye_pos() noexcept {
+        const auto game_scene_node = m_pGameSceneNode();
+        ASSERT_MSG(game_scene_node, "game_scene_node null in base_model_entity::get_eye_pos");
+        
+        return game_scene_node->m_vecOrigin() + m_vecViewOffset();
+    }
+};
+
+class base_player_pawn : public base_model_entity {
 public:
     NETVAR(m_hController, "C_BasePlayerPawn", "m_hController", handle<base_player_controller>);
     NETVAR(m_pWeaponServices, "C_BasePlayerPawn", "m_pWeaponServices", player_weapon_services*);
