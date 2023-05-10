@@ -148,9 +148,9 @@ void render::render() noexcept {
     auto r = render::renderer(ImGui::GetBackgroundDrawList());
 
     features::render(&r);
+    debug_overlay::render(&r);
 
     menu::render();
-    debug_overlay::render();
 
     ImGui::Render();
     context->OMSetRenderTargets(1, &render_target_view, nullptr);

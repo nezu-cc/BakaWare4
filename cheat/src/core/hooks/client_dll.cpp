@@ -35,6 +35,7 @@ void __fastcall hooks::on_render_start::fn(se::view_render* rcx) {
     original(rcx);
     math::update_view_matrix();
     entity_cache::update_bounding_boxes();
+    debug_overlay::w2s(); // has to be last
 }
 
 // NOTE: yes, this takes a entity_instance, but I'm lazy

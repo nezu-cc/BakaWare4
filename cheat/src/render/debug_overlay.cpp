@@ -3,10 +3,13 @@
 
 #ifdef _DEBUG
 
-void debug_overlay::render() noexcept {
+void debug_overlay::render(render::renderer* r) noexcept {
     std::unique_lock lock(sections_mtx);
     if (sections.empty())
         return;
+
+    for (auto &[name, section] : sections)
+        section.render(r);
     
     if (ImGui::Begin(XOR("Debug Overlay"))){
         for (auto &[name, section] : sections) {
@@ -17,6 +20,12 @@ void debug_overlay::render() noexcept {
         }
     }
     ImGui::End();
+}
+
+void debug_overlay::w2s() noexcept {
+    std::unique_lock lock(sections_mtx);
+    for (auto &[name, section] : sections)
+        section.w2s();
 }
 
 #endif
