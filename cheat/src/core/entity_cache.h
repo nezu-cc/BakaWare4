@@ -1,6 +1,7 @@
 #pragma once
 #include <unordered_map>
 #include <shared_mutex>
+#include <unordered_map>
 #include "../base/base.h"
 #include "../valve/cs/entity.h"
 #include <span>
@@ -18,14 +19,14 @@ enum class entity_type : uint8_t {
 
 class cached_entity {
 public:
-    cs::handle<cs::base_entity> handle;
+    cs::handle<> handle;
     entity_type type;
     bbox bb{ };
     std::array<std::pair<vec2, vec2>, MAX_STUDIO_BONES> scr_bones{ };
     int visible_bone_count{ };
     bool draw{ };
 
-    cached_entity(cs::handle<cs::base_entity> handle, entity_type type) noexcept
+    cached_entity(cs::handle<> handle, entity_type type) noexcept
         : handle(handle), type(type) {}
     
     cached_entity(const cached_entity&) = delete;
@@ -42,8 +43,16 @@ public:
     }
 };
 
+// typedef for entity callback
+using entity_callback = void(*)(int index, const cs::handle<> handle) noexcept;
+struct entity_callbacks {
+    entity_callback add;
+    entity_callback remove;
+};
+
 inline std::shared_mutex mutex;
 inline std::unordered_map<int, cached_entity> entities;
+inline std::unordered_multimap<entity_type, entity_callbacks> callbacks;
 
 entity_type get_entity_type(cs::base_entity *entity) noexcept;
 
@@ -51,5 +60,6 @@ void initialize() noexcept;
 void on_add_entity(cs::base_entity* entity, cs::handle<cs::base_entity> handle) noexcept;
 void on_remove_entity(cs::base_entity* entity, cs::handle<cs::base_entity> handle) noexcept;
 void update_bounding_boxes() noexcept;
+void register_callback(entity_type type, entity_callback add, entity_callback remove) noexcept;
 
 }

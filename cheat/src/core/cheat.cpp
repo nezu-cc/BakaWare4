@@ -3,6 +3,7 @@
 #include "../valve/cs/cs.h"
 #include "../base/crash_handler.h"
 #include "entity_cache.h"
+#include "features/features.h"
 
 void cheat::initialize(uintptr_t base) noexcept {
     cheat::base = base;
@@ -18,6 +19,7 @@ void cheat::initialize(uintptr_t base) noexcept {
     input::initialize(menu::is_open);
     hooks::initialize();
     entity_cache::initialize();
+    features::initialize();
     // config::initialize();
 
     LOG_ERROR(XOR("BakaWare initialized. Base: {} Last full build: {} {}"), (void*)base, __DATE__, __TIME__);

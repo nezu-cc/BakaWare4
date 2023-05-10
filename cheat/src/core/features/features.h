@@ -21,6 +21,9 @@ namespace features {
         void input(angle* va, se::move_input* input, float frame_time) noexcept;
     }
 
+    inline void initialize() noexcept {
+    }
+
     inline void render(render::renderer* r) noexcept {
         esp::render(r);
         misc::render(r);

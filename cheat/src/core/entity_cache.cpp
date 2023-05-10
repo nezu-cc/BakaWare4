@@ -39,11 +39,31 @@ void entity_cache::on_add_entity(cs::base_entity *entity, cs::handle<cs::base_en
 
     std::unique_lock lock(mutex);
     entities.insert_or_assign(index, cached_entity(handle, type));
+    
+    // call callbacks
+    for (auto& [callback_type, callbacks] : callbacks) {
+        if (!callbacks.add || callback_type != type)
+            continue;
+        callbacks.add(index, handle);
+    }
 }
 
 void entity_cache::on_remove_entity(cs::base_entity *entity, cs::handle<cs::base_entity> handle) noexcept {
     std::unique_lock lock(mutex);
-    entities.erase(handle.get_index());
+    const auto index = handle.get_index();
+
+    // call callbacks
+    for (auto& [callback_type, callbacks] : callbacks) {
+        if (!callbacks.remove)
+            continue;
+
+        if (callback_type != get_entity_type(entity))
+            continue;
+
+        callbacks.remove(index, handle);
+    }
+
+    entities.erase(index);
 }
 
 void entity_cache::update_bounding_boxes() noexcept {
@@ -75,5 +95,22 @@ void entity_cache::update_bounding_boxes() noexcept {
             break;
         }
         }
+    }
+}
+
+void entity_cache::register_callback(entity_type type, entity_callback add, entity_callback remove) noexcept {
+    if (!add && !remove)
+        return;
+
+    std::unique_lock lock(mutex);
+    callbacks.insert(std::make_pair(type, entity_callbacks{ add, remove }));
+
+    if (!add)
+        return;
+    
+    // add existing entities
+    for (auto& [index, cached_entity] : entities) {
+        if (cached_entity.type == type)
+            add(index, cached_entity.handle);
     }
 }
