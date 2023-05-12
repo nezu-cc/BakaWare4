@@ -59,3 +59,81 @@ void math::angle_vector(const angle &angles, vec3 &forward) noexcept {
     forward.y = cp * sy;
     forward.z = -sp;
 }
+
+vec3 math::angle_vector(const angle &angles) noexcept {
+    vec3 forward;
+    angle_vector(angles, forward);
+    return forward;
+}
+
+// distance between to line segments
+float math::segment_dist(vec3 start1, vec3 end1, vec3 start2, vec3 end2) noexcept {
+    vec3 u = end1 - start1;
+    vec3 v = end2 - start2;
+    vec3 w = start1 - start2;
+    float a = u.dot_product(u);
+    float b = u.dot_product(v);
+    float c = v.dot_product(v);
+    float d = u.dot_product(w);
+    float e = v.dot_product(w);
+    float D = a * c - b * b;
+    float sc, sN, sD = D;
+    float tc, tN, tD = D;
+
+    if (D < 0.001f) {
+        sN = 0.0f;
+        sD = 1.0f;
+        tN = e;
+        tD = c;
+    } else {
+        sN = (b * e - c * d);
+        tN = (a * e - b * d);
+        if (sN < 0.0f) {
+            sN = 0.0f;
+            tN = e;
+            tD = c;
+        } else if (sN > sD) {
+            sN = sD;
+            tN = e + b;
+            tD = c;
+        }
+    }
+
+    if (tN < 0.0f) {
+        tN = 0.0f;
+
+        if (-d < 0.0f) {
+            sN = 0.0f;
+        } else if (-d > a) {
+            sN = sD;
+        } else {
+            sN = -d;
+            sD = a;
+        }
+    } else if (tN > tD) {
+        tN = tD;
+
+        if ((-d + b) < 0.0f) {
+            sN = 0;
+        } else if ((-d + b) > a) {
+            sN = sD;
+        } else {
+            sN = (-d + b);
+            sD = a;
+        }
+    }
+
+    sc = (std::abs(sN) < 0.001f ? 0.0f : sN / sD);
+    tc = (std::abs(tN) < 0.001f ? 0.0f : tN / tD);
+
+    vec3 dP = w + (u * sc) - (v * tc);
+    return dP.length();
+}
+
+vec3 math::lerp(const vec3 &a, const vec3 &b, float t) noexcept {
+    return vec3(
+        std::lerp(a.x, b.x, t),
+        std::lerp(a.y, b.y, t),
+        std::lerp(a.z, b.z, t)
+    );
+}

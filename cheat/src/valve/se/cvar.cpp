@@ -2,7 +2,7 @@
 #include "../../memory/interfaces.h"
 #include "cvar.h"
 
-inline void se::static_convar::find() noexcept {
+void se::static_convar::find() noexcept {
     std::scoped_lock lock(mtx);
     if (found)
         return;

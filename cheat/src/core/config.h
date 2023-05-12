@@ -62,24 +62,45 @@ public:
     )
 };
 
+class backtrack_config {
+public:
+    bool enabled{ true };
+    bool skeleton{ true };
+    float max_time_ms{ 1000 };
+
+    NLOHMANN_DEFINE_TYPE_INTRUSIVE_WITH_DEFAULT(
+        backtrack_config, enabled, skeleton, max_time_ms
+    )
+};
+
+class legit_config {
+public:
+    backtrack_config backtrack{ };
+    rcs_config rcs { };
+
+    NLOHMANN_DEFINE_TYPE_INTRUSIVE_WITH_DEFAULT(
+        legit_config, backtrack, rcs
+    )
+};
+
 class misc_config {
 public:
     bool reoil_crosshair { true };
-    rcs_config rcs { }; // TODO: move to legit bot
     bool bunny_hop { false };
 
     NLOHMANN_DEFINE_TYPE_INTRUSIVE_WITH_DEFAULT(
-        misc_config, reoil_crosshair, rcs, bunny_hop
+        misc_config, reoil_crosshair, bunny_hop
     )
 };
 
 class conf {
 public:
     esp_config esp{ };
+    legit_config legit{ };
     misc_config misc{ };
 
     NLOHMANN_DEFINE_TYPE_INTRUSIVE_WITH_DEFAULT(
-        conf, esp, misc
+        conf, esp, legit, misc
     )
 };
 

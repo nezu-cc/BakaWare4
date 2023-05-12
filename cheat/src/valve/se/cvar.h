@@ -57,7 +57,7 @@ private:
     con_var* var { };
     const char* name { };
 
-    inline void find() noexcept;
+    void find() noexcept;
 
 public:
     static_convar(const char* name) noexcept : name(name) { }

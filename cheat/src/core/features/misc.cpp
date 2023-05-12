@@ -21,8 +21,7 @@ void render_recoil_crosshair(render::renderer* r) noexcept {
     cheat::local->get_view_angles(&va);
     cheat::local->get_aim_punch(&aim_punch, true);
 
-    vec3 forward;
-    math::angle_vector(va + aim_punch, forward);
+    vec3 forward = math::angle_vector(va + aim_punch);
 
     vec2 screen;
     math::world_to_screen(pos + forward * 2000.f, screen);
@@ -83,8 +82,8 @@ void run_rcs(angle* va) noexcept {
     angle delta = aim_punch - old_aim_punch;
     old_aim_punch = aim_punch;
 
-    delta.x *= cfg.misc.rcs.vertical / 100.f;
-    delta.y *= cfg.misc.rcs.horizontal / 100.f;
+    delta.x *= cfg.legit.rcs.vertical / 100.f;
+    delta.y *= cfg.legit.rcs.horizontal / 100.f;
 
     *va -= delta;
     va->normalize();
@@ -104,6 +103,6 @@ void features::misc::create_move(se::user_cmd *cmd) noexcept {
 }
 
 void features::misc::input(angle *va, se::move_input *input, float frame_time) noexcept {
-    if (cfg.misc.rcs.enabled)
+    if (cfg.legit.rcs.enabled)
         run_rcs(va);
 }

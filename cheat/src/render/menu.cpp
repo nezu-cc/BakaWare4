@@ -153,9 +153,6 @@ void menu::menu_tab_visuals::render() noexcept {
 void menu::menu_tab_misc::render() noexcept {
     ImGui::Checkbox(XOR("Bunny hop"), &cfg.misc.bunny_hop);
     ImGui::Checkbox(XOR("Recoil crosshair"), &cfg.misc.reoil_crosshair);
-    ImGui::Checkbox(XOR("RCS enable"), &cfg.misc.rcs.enabled);
-    ImGui::Text(XOR("Strength (horizontal/vertical)"));
-    ImGui::SliderFloat2(XOR("##RCSStrength"), cfg.misc.rcs.axis, 0.0f, 100.0f, "%.1f%");
 
     if (ImGui::Button(XOR("CRASH!")))
         *(uint32_t*)nullptr = 0xDEADBEEF;
@@ -163,4 +160,16 @@ void menu::menu_tab_misc::render() noexcept {
     ASSERT(!ImGui::Button(XOR("ASSERT!")));
     ImGui::SameLine();
     ASSERT_MSG(!ImGui::Button(XOR("ASSERT MSG!")), "This is a manual assert message!");
+}
+
+void menu::menu_tab_legit::render() noexcept {
+    ImGui::SeparatorText(XOR("RCS"));
+    ImGui::Checkbox(XOR("Enabled##RCS"), &cfg.legit.rcs.enabled);
+    ImGui::Text(XOR("Strength (horizontal/vertical)##RCS"));
+    ImGui::SliderFloat2(XOR("##RCSStrength"), cfg.legit.rcs.axis, 0.0f, 100.0f, "%.1f%");
+
+    ImGui::SeparatorText(XOR("Backtrack"));
+    ImGui::Checkbox(XOR("Enabled##Backtrack"), &cfg.legit.backtrack.enabled);
+    ImGui::Checkbox(XOR("Skeleton##Backtrack"), &cfg.legit.backtrack.skeleton);
+    ImGui::SliderFloat(XOR("Max delay##Backtrack"), &cfg.legit.backtrack.max_time_ms, 0, 1000, "%.0f ms");
 }

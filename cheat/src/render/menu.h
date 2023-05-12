@@ -36,8 +36,15 @@ namespace menu {
         void render() noexcept override;
     };
 
+    class menu_tab_legit : public menu_tab {
+    public:
+        menu_tab_legit() noexcept : menu_tab(XOR("Legit")) { };
+        void render() noexcept override;
+    };
+
     inline std::vector<menu_tab*> tabs {
         new menu_tab_visuals(),
-        new menu_tab_misc()
+        new menu_tab_misc(),
+        new menu_tab_legit()
     };
 }

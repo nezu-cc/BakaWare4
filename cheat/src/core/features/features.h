@@ -11,6 +11,12 @@
 
 namespace features {
 
+    namespace backtrack {
+        void initialize() noexcept;
+        void render(render::renderer* r) noexcept;
+        void create_move(se::user_cmd* cmd) noexcept;
+    }
+
     namespace esp {
         void render(render::renderer* r) noexcept;
     }
@@ -22,15 +28,19 @@ namespace features {
     }
 
     inline void initialize() noexcept {
+        backtrack::initialize();
     }
 
+
     inline void render(render::renderer* r) noexcept {
+        backtrack::render(r);
         esp::render(r);
         misc::render(r);
     }
 
     inline void create_move(se::user_cmd* cmd) noexcept {
         misc::create_move(cmd);
+        backtrack::create_move(cmd);
     }
 
     inline void input(angle* va, se::move_input* input, float frame_time) noexcept {
