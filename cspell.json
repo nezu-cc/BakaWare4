@@ -19,9 +19,11 @@
         "forwardmove",
         "gameoverlayrenderer",
         "godmode",
+        "hitchance",
         "inrain",
         "inwater",
         "killme",
+        "knifebot",
         "leftmove",
         "legitbot",
         "Maxs",
@@ -50,6 +52,7 @@
         "subtick",
         "subticks",
         "transragdoll",
+        "triggerbot",
         "unblockable",
         "updaterate",
         "upmove",
@@ -57,7 +60,8 @@
         "waterjump",
         "worldbrush",
         "xored",
-        "XORSTR"
+        "XORSTR",
+        "zeusbot"
     ],
     "ignoreWords": [],
     "import": []

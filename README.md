@@ -4,23 +4,7 @@ Counter-Strike 2 cheat
 
 ## Features
 
-- ESP
-  - player
-    - Box
-    - Name
-    - Health
-    - Skeleton
-    - weapon
-    - ammo
-  - weapon
-    - Box
-    - Name
-    - Ammo
-- Misc
-  - bunnyhop
-  - recoil crosshair
-  - RCS
-  - Unlock all cvars (**Debug build only!**)
+check [TODO.md](TODO.md) for a list of current and potential new features
 
 **THIS CHEAT IS STILL WIP, MORE TO COME SOON:tm:**
 
