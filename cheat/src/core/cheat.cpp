@@ -5,6 +5,30 @@
 #include "entity_cache.h"
 #include "features/features.h"
 
+#include <sol/sol.hpp>
+
+void test() noexcept {
+    sol::state lua;
+    lua.open_libraries(sol::lib::base);
+    lua.open_libraries(sol::lib::string);
+    lua.open_libraries(sol::lib::math);
+    lua.open_libraries(sol::lib::bit32);
+    lua.open_libraries(sol::lib::ffi);
+    lua.open_libraries(sol::lib::jit);
+    lua.set_function("test", [](std::string message) {
+        LOG_INFO(XOR("Hello from lua: {}"), message);
+    });
+    const auto res = lua.script("test(type(jit))");
+    for (auto &&i : res)
+    {
+        if (i.is<std::string>())
+            LOG_INFO(XOR("Lua result: {}, s: {}"), (int)res.status(), i.as<std::string>());
+        else
+            LOG_INFO(XOR("Lua result: {}, {}"), (int)res.status(), (int)i.get_type());
+    }
+}
+
+
 void cheat::initialize(uintptr_t base) noexcept {
     cheat::base = base;
 
@@ -23,6 +47,7 @@ void cheat::initialize(uintptr_t base) noexcept {
     // config::initialize();
 
     LOG_ERROR(XOR("BakaWare initialized. Base: {} Last full build: {} {}"), (void*)base, __DATE__, __TIME__);
+    test();
 }
 
 DWORD cheat::end(LPVOID instance) noexcept {

@@ -17,14 +17,14 @@
       "toolchainFile": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake",
       "environment": {
         "VCPKG_ROOT": "./vcpkg",
-        "VCPKG_TARGET_TRIPLET": "x64-windows"
+        "VCPKG_TARGET_TRIPLET": "x64-windows-static-bw"
       }
     },
     {
-      "name": "x64-windows-static",
+      "name": "x64-windows-static-release",
       "inherits": "x64-windows",
       "environment": {
-        "VCPKG_TARGET_TRIPLET": "x64-windows-static"
+        "VCPKG_TARGET_TRIPLET": "x64-windows-static-release-bw"
       }
     }
   ],
@@ -36,12 +36,12 @@
     },
     {
       "name": "Release",
-      "configurePreset": "x64-windows-static",
+      "configurePreset": "x64-windows-static-release",
       "configuration": "Release"
     },
     {
       "name": "RelWithDebInfo",
-      "configurePreset": "x64-windows-static",
+      "configurePreset": "x64-windows-static-release",
       "configuration": "RelWithDebInfo"
     }
   ]

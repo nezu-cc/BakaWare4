@@ -27,7 +27,7 @@ jobs:
     - name: Run CMake consuming CMakePreset.json and run vcpkg to build dependencies
       uses: lukka/run-cmake@v10
       with:
-        configurePreset: ${{ matrix.build-type == 'Debug' && 'x64-windows' || 'x64-windows-static' }}
+        configurePreset: ${{ matrix.build-type == 'Debug' && 'x64-windows' || 'x64-windows-static-release' }}
         buildPreset: ${{matrix.build-type}}
 
     - uses: actions/upload-artifact@v3

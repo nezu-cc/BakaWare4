@@ -9,6 +9,11 @@
         "dx11-binding",
         "win32-binding"
       ]
-    }
-  ]
+    },
+    "sol2",
+    "luajit"
+  ],
+  "vcpkg-configuration": {
+    "overlay-triplets": ["vcpkg-triplets"]
+  }
 }
